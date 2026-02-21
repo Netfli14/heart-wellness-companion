@@ -2,9 +2,16 @@ import { Link } from 'react-router-dom';
 import { Heart, Activity, FileText, MapPin } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import heroImage from '@/assets/hero-heart.jpg';
+import { useState, useEffect } from 'react';
 
 const Index = () => {
   const { t } = useLanguage();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const stored = localStorage.getItem('cardiocheck_user');
+    if (stored) setUser(JSON.parse(stored));
+  }, []);
 
   const features = [
     { icon: Heart, title: t('features.symptoms.title'), desc: t('features.symptoms.desc'), color: 'text-accent' },
@@ -15,7 +22,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <img src={heroImage} alt="Heart Health" className="w-full h-full object-cover" />
@@ -35,15 +41,12 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-4 animate-fade-in-up-delay-3">
               <Link
-                to="/analysis"
+                to={user ? '/analysis' : '/auth'}
                 className="hero-gradient px-6 py-3 rounded-xl font-semibold text-primary-foreground hover:opacity-90 transition-opacity shadow-lg"
               >
-                {t('hero.cta')}
+                {user ? t('nav.analysis') : t('hero.cta')}
               </Link>
-              <a
-                href="#features"
-                className="px-6 py-3 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors"
-              >
+              <a href="#features" className="px-6 py-3 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors">
                 {t('hero.cta2')}
               </a>
             </div>
@@ -51,7 +54,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features */}
       <section id="features" className="py-20 bg-muted/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl font-bold text-center text-foreground mb-12">{t('features.title')}</h2>

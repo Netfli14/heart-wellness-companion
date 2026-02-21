@@ -9,10 +9,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Index from "./pages/Index";
 import Analysis from "./pages/Analysis";
-import Results from "./pages/Results";
 import Hospitals from "./pages/Hospitals";
 import Auth from "./pages/Auth";
 import HealthChart from "./pages/HealthChart";
+import About from "./pages/About";
+import Medicine from "./pages/Medicine";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,10 +30,11 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/analysis" element={<Analysis />} />
-              <Route path="/results" element={<Results />} />
               <Route path="/hospitals" element={<Hospitals />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/chart" element={<HealthChart />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/medicine" element={<Medicine />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
