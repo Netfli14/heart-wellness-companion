@@ -96,6 +96,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'results.newAnalysis': 'Пройти новый анализ',
     'results.viewHospitals': 'Посмотреть больницы',
     'results.references': 'Медицинские источники',
+    'results.dataLimitations': 'Ограничения анализа',
     // Chart
     'chart.title': 'Дашборд здоровья',
     'chart.symptoms': 'Анализ по ощущениям',
@@ -261,6 +262,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'results.newAnalysis': 'Жаңа талдау жасау',
     'results.viewHospitals': 'Ауруханаларды көру',
     'results.references': 'Медициналық дереккөздер',
+    'results.dataLimitations': 'Талдау шектеулері',
     'chart.title': 'Денсаулық дашборды',
     'chart.symptoms': 'Сезімдер бойынша',
     'chart.blood': 'Қан анализі',
@@ -420,6 +422,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'results.newAnalysis': 'New Analysis',
     'results.viewHospitals': 'View Hospitals',
     'results.references': 'Medical References',
+    'results.dataLimitations': 'Analysis Limitations',
     'chart.title': 'Health Dashboard',
     'chart.symptoms': 'Symptom Analysis',
     'chart.blood': 'Blood Test',
