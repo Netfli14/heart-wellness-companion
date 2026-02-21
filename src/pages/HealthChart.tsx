@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Lock, AlertTriangle, ArrowRight, Hospital, Plus } from 'lucide-react';
+import { Lock, AlertTriangle, ArrowRight, Hospital, Plus, BookOpen } from 'lucide-react';
 
 const HealthChart = () => {
   const { t, lang } = useLanguage();
@@ -32,7 +32,6 @@ const HealthChart = () => {
 
   const latest = analyses.length > 0 ? analyses[analyses.length - 1] : null;
 
-  // Chart data: each analysis is a data point
   const symptomsData = analyses.map((a, i) => ({
     name: `${t('chart.analysis')} ${i + 1}`,
     normal: 85,
@@ -103,7 +102,8 @@ const HealthChart = () => {
           <>
             {/* Symptoms Chart */}
             <div className="bg-card rounded-2xl p-6 border border-border card-medical">
-              <h2 className="text-lg font-bold text-foreground mb-4">{t('chart.symptoms')}</h2>
+              <h2 className="text-lg font-bold text-foreground mb-2">{t('chart.symptoms')}</h2>
+              <p className="text-xs text-muted-foreground mb-4">{t('chart.xAxis')} · {t('chart.yAxis')}</p>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={symptomsData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -120,7 +120,8 @@ const HealthChart = () => {
             {/* Blood Chart */}
             {bloodData.length > 0 && (
               <div className="bg-card rounded-2xl p-6 border border-border card-medical">
-                <h2 className="text-lg font-bold text-foreground mb-4">{t('chart.blood')}</h2>
+                <h2 className="text-lg font-bold text-foreground mb-2">{t('chart.blood')}</h2>
+                <p className="text-xs text-muted-foreground mb-4">{t('chart.xAxis')} · {t('chart.yAxis')}</p>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={bloodData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -205,6 +206,27 @@ const HealthChart = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Medical References */}
+                {latest.references?.length > 0 && (
+                  <div className="bg-card rounded-2xl p-6 border border-border card-medical">
+                    <div className="flex items-center gap-2 mb-4">
+                      <BookOpen className="w-5 h-5 text-primary" />
+                      <h2 className="text-lg font-bold text-foreground">{t('results.references')}</h2>
+                    </div>
+                    <div className="space-y-2">
+                      {latest.references.map((ref: any, i: number) => (
+                        <div key={i} className="bg-muted/50 rounded-xl p-3 border border-border">
+                          <a href={ref.url} target="_blank" rel="noopener noreferrer"
+                            className="text-sm font-medium text-primary hover:underline">
+                            {ref.title}
+                          </a>
+                          {ref.relevance && <p className="text-xs text-muted-foreground mt-1">{ref.relevance}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Hospital Warning */}
                 {latest.needsHospital && (

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, Activity, FileText, MapPin } from 'lucide-react';
+import { Heart, Activity, FileText, MapPin, Shield, Award } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import heroImage from '@/assets/hero-heart.jpg';
 import { useState, useEffect } from 'react';
@@ -31,7 +31,7 @@ const Index = () => {
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-6 animate-fade-in-up">
               <Heart className="w-8 h-8 text-primary fill-primary pulse-dot" />
-              <span className="text-sm font-semibold text-primary uppercase tracking-wider">CardioCheck</span>
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">HeartAI</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 animate-fade-in-up-delay-1">
               {t('hero.title')}
@@ -49,6 +49,17 @@ const Index = () => {
               <a href="#features" className="px-6 py-3 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors">
                 {t('hero.cta2')}
               </a>
+            </div>
+            {/* Credibility badges */}
+            <div className="flex items-center gap-4 mt-8 animate-fade-in-up-delay-3">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Shield className="w-4 h-4 text-primary" />
+                <span>ESC · AHA/ACC · WHO</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Award className="w-4 h-4 text-primary" />
+                <span>NIS IB Astana</span>
+              </div>
             </div>
           </div>
         </div>

@@ -13,33 +13,36 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const langName = lang === 'ru' ? 'Russian' : lang === 'kz' ? 'Kazakh' : 'English';
+
     let systemPrompt = "";
     let userPrompt = "";
 
     if (type === "medical_analysis") {
-      const { symptoms, freeText, diet, bloodData, userProfile, previousAnalyses } = data;
+      const { symptoms, freeText, diet, activity, bloodData, userProfile, previousAnalyses } = data;
       
-      systemPrompt = `You are a senior cardiologist AI assistant. You must provide analysis based on established medical literature and clinical guidelines (ESC, AHA/ACC cardiovascular risk assessment guidelines, WHO cardiovascular disease prevention guidelines).
+      systemPrompt = `You are a senior cardiologist AI assistant. You MUST provide analysis based on established medical literature and clinical guidelines (ESC, AHA/ACC cardiovascular risk assessment guidelines, WHO cardiovascular disease prevention guidelines).
 
-IMPORTANT: Always reference medical guidelines when making assessments. Be objective and evidence-based.
+CRITICAL: Your ENTIRE response must be in ${langName}. Every single field, every word must be in ${langName}. No exceptions.
 
-You must respond in ${lang === 'ru' ? 'Russian' : lang === 'kz' ? 'Kazakh' : 'English'}.
+IMPORTANT: Always reference specific medical guidelines and journals when making assessments. Be objective and evidence-based. For each disease risk identified, provide a link to a relevant published medical study or guideline (PubMed, ESC guidelines, AHA/ACC guidelines, etc).
 
 Your response MUST be valid JSON with this exact structure:
 {
-  "verdict": "Detailed medical verdict text based on all provided data",
+  "verdict": "Detailed medical verdict text in ${langName} based on all provided data",
   "riskScore": <number 0-100>,
   "riskCategory": "low|moderate|high|critical",
-  "shortTermMeasures": ["measure1", "measure2", ...],
-  "longTermMeasures": ["measure1", "measure2", ...],
-  "diseases": [{"name": "disease name", "risk": <number 0-100>}],
+  "shortTermMeasures": ["measure1 in ${langName}", "measure2 in ${langName}", ...],
+  "longTermMeasures": ["measure1 in ${langName}", "measure2 in ${langName}", ...],
+  "diseases": [{"name": "disease name in ${langName}", "risk": <number 0-100>}],
   "needsHospital": <boolean>,
-  "hospitalMessage": "message about hospital if needed",
-  "nextAnalysisMessage": "message about when to do next analysis",
+  "hospitalMessage": "message in ${langName} about hospital if needed",
+  "nextAnalysisMessage": "message in ${langName} about when to do next analysis",
   "symptomsChartScore": <number 0-100>,
   "bloodChartScore": <number 0-100 or null if no blood data>,
-  "normalSymptomsInfo": "what a healthy person would feel",
-  "normalBloodInfo": "what normal blood values look like"
+  "normalSymptomsInfo": "what a healthy person would feel, in ${langName}",
+  "normalBloodInfo": "what normal blood values look like, in ${langName}",
+  "references": [{"title": "study/guideline title", "url": "https://pubmed.ncbi.nlm.nih.gov/... or guideline URL", "relevance": "brief note in ${langName}"}]
 }`;
 
       userPrompt = `Patient profile:
@@ -49,8 +52,9 @@ Your response MUST be valid JSON with this exact structure:
 - Chronic diseases: ${userProfile?.chronicDiseases || 'none'}
 - Allergies: ${userProfile?.allergies || 'none'}
 - Bad habits: ${userProfile?.badHabits || 'none'}
+- Body features noted over lifetime: ${userProfile?.bodyFeatures || 'none'}
 
-Symptom questionnaire answers:
+Symptom questionnaire answers (10 questions):
 ${JSON.stringify(symptoms, null, 2)}
 
 Patient's own description of feelings:
@@ -59,20 +63,26 @@ ${freeText || 'Not provided'}
 Recent diet:
 ${diet || 'Not provided'}
 
+Physical activity & lifestyle:
+- Exercise: ${activity?.exercise || 'Not provided'}
+- Sleep: ${activity?.sleep || 'Not provided'}
+- Stress level: ${activity?.stress || 'Not provided'}
+- Resting heart rate: ${activity?.heartRate ? activity.heartRate + ' bpm' : 'Not provided'}
+
 Blood test data:
 ${bloodData ? JSON.stringify(bloodData, null, 2) : 'Not provided (skipped)'}
 
 Previous analyses count: ${previousAnalyses?.length || 0}
 ${previousAnalyses?.length ? `Previous scores: ${JSON.stringify(previousAnalyses.map((a: any) => ({ date: a.date, symptomsScore: a.symptomsChartScore, bloodScore: a.bloodChartScore })))}` : ''}
 
-Provide a comprehensive cardiovascular health assessment based on medical literature.`;
+Provide a comprehensive cardiovascular health assessment. Include references to specific medical studies/guidelines. RESPOND ENTIRELY IN ${langName}.`;
     } else if (type === "prescription") {
-      systemPrompt = `You are a pharmacist AI assistant. Analyze the prescription description and identify medications. Respond in ${lang === 'ru' ? 'Russian' : lang === 'kz' ? 'Kazakh' : 'English'}.
+      systemPrompt = `You are a pharmacist AI assistant. Analyze the prescription description and identify medications. RESPOND ENTIRELY IN ${langName}.
 
 Your response MUST be valid JSON:
 {
-  "medications": [{"name": "medication name", "dosage": "dosage info", "purpose": "what it's for"}],
-  "advice": "general advice about the medications"
+  "medications": [{"name": "medication name in ${langName}", "dosage": "dosage info in ${langName}", "purpose": "what it's for in ${langName}"}],
+  "advice": "general advice in ${langName} about the medications"
 }`;
       userPrompt = `Prescription text/description: ${data.prescriptionText || 'No text provided'}`;
     }
@@ -84,7 +94,7 @@ Your response MUST be valid JSON:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -111,13 +121,12 @@ Your response MUST be valid JSON:
     const aiResponse = await response.json();
     const content = aiResponse.choices?.[0]?.message?.content || "";
     
-    // Parse JSON from response (handle markdown code blocks)
     let parsed;
     try {
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
       parsed = JSON.parse(jsonMatch ? jsonMatch[1] : content);
     } catch {
-      parsed = { verdict: content, riskScore: 50, riskCategory: "moderate", shortTermMeasures: [], longTermMeasures: [], diseases: [], needsHospital: false, hospitalMessage: "", nextAnalysisMessage: "", symptomsChartScore: 50, bloodChartScore: null, normalSymptomsInfo: "", normalBloodInfo: "" };
+      parsed = { verdict: content, riskScore: 50, riskCategory: "moderate", shortTermMeasures: [], longTermMeasures: [], diseases: [], needsHospital: false, hospitalMessage: "", nextAnalysisMessage: "", symptomsChartScore: 50, bloodChartScore: null, normalSymptomsInfo: "", normalBloodInfo: "", references: [] };
     }
 
     return new Response(JSON.stringify(parsed), {
