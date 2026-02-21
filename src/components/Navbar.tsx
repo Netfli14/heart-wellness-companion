@@ -46,7 +46,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 text-primary font-bold text-xl">
             <Heart className="w-6 h-6 fill-primary" />
-            <span className="font-display hidden sm:inline">CardioCheck</span>
+            <span className="font-display hidden sm:inline">HeartAI</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">

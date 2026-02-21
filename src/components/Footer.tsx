@@ -9,8 +9,9 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 text-center">
         <div className="flex items-center justify-center gap-2 text-primary mb-3">
           <Heart className="w-5 h-5 fill-primary" />
-          <span className="font-bold text-lg">CardioCheck</span>
+          <span className="font-bold text-lg">HeartAI</span>
         </div>
+        <p className="text-xs text-muted-foreground mb-1">{t('footer.powered')}</p>
         <p className="text-sm text-muted-foreground mb-1">{t('footer.disclaimer')}</p>
         <p className="text-xs text-muted-foreground">{t('footer.rights')}</p>
       </div>

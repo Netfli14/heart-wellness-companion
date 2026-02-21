@@ -9,13 +9,12 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({
     email: '', password: '', fullName: '', age: '', gender: '',
-    city: '', chronicDiseases: '', allergies: '', badHabits: '',
+    city: '', chronicDiseases: '', allergies: '', badHabits: '', bodyFeatures: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
-      // Login: check stored user
       const stored = localStorage.getItem('cardiocheck_user');
       if (stored) {
         const user = JSON.parse(stored);
@@ -24,14 +23,14 @@ const Auth = () => {
           return;
         }
       }
-      // Simple mock - just log in
       localStorage.setItem('cardiocheck_user', JSON.stringify({ email: form.email, fullName: 'User' }));
       navigate('/chart');
     } else {
       localStorage.setItem('cardiocheck_user', JSON.stringify({
         email: form.email, fullName: form.fullName, age: form.age,
         gender: form.gender, city: form.city,
-        chronicDiseases: form.chronicDiseases, allergies: form.allergies, badHabits: form.badHabits,
+        chronicDiseases: form.chronicDiseases, allergies: form.allergies,
+        badHabits: form.badHabits, bodyFeatures: form.bodyFeatures,
       }));
       navigate('/analysis');
     }
@@ -47,7 +46,7 @@ const Auth = () => {
         <div className="bg-card rounded-2xl p-8 border border-border card-medical">
           <div className="flex items-center justify-center gap-2 mb-6">
             <Heart className="w-8 h-8 text-primary fill-primary" />
-            <span className="text-xl font-bold text-foreground">CardioCheck</span>
+            <span className="text-xl font-bold text-foreground">HeartAI</span>
           </div>
 
           <h2 className="text-2xl font-bold text-foreground text-center mb-6">
@@ -92,6 +91,11 @@ const Auth = () => {
                 <div>
                   <label className="block text-sm text-muted-foreground mb-1">{t('auth.badHabits')}</label>
                   <input type="text" value={form.badHabits} onChange={e => update('badHabits', e.target.value)} className={inputClass} placeholder={t('auth.badHabits.placeholder')} />
+                </div>
+                <div>
+                  <label className="block text-sm text-muted-foreground mb-1">{t('auth.bodyFeatures')}</label>
+                  <textarea value={form.bodyFeatures} onChange={e => update('bodyFeatures', e.target.value)}
+                    className={`${inputClass} min-h-[60px] resize-y`} placeholder={t('auth.bodyFeatures.placeholder')} />
                 </div>
               </>
             )}
