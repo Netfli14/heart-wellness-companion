@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Lock, AlertTriangle, ArrowRight, Hospital, Plus, BookOpen } from 'lucide-react';
+import { Lock, AlertTriangle, ArrowRight, Hospital, Plus, BookOpen, Info } from 'lucide-react';
 
 const HealthChart = () => {
   const { t, lang } = useLanguage();
@@ -34,13 +34,13 @@ const HealthChart = () => {
 
   const symptomsData = analyses.map((a, i) => ({
     name: `${t('chart.analysis')} ${i + 1}`,
-    normal: 85,
+    normal: a.normalHealthScore ?? 85,
     user: a.symptomsChartScore ?? 50,
   }));
 
   const bloodData = analyses.filter(a => a.bloodChartScore != null).map((a, i) => ({
     name: `${t('chart.analysis')} ${i + 1}`,
-    normal: 85,
+    normal: a.normalHealthScore ?? 85,
     user: a.bloodChartScore ?? 50,
   }));
 
@@ -115,6 +115,15 @@ const HealthChart = () => {
                   <Line type="monotone" dataKey="user" name={t('chart.yours')} stroke="hsl(0, 78%, 55%)" strokeWidth={2} dot={{ r: 5, fill: 'hsl(0, 78%, 55%)', cursor: 'pointer' }} activeDot={{ r: 7 }} />
                 </LineChart>
               </ResponsiveContainer>
+              {/* Normal score justification */}
+              {latest?.normalScoreJustification && (
+                <div className="mt-3 flex items-start gap-2 bg-muted/50 rounded-lg p-3">
+                  <Info className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-muted-foreground">
+                    <span className="font-semibold text-foreground">{t('chart.normal')}: {latest.normalHealthScore}</span> — {latest.normalScoreJustification}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Blood Chart */}
@@ -133,6 +142,17 @@ const HealthChart = () => {
                     <Line type="monotone" dataKey="user" name={t('chart.yours')} stroke="hsl(210, 78%, 55%)" strokeWidth={2} dot={{ r: 5, fill: 'hsl(210, 78%, 55%)', cursor: 'pointer' }} activeDot={{ r: 7 }} />
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+            )}
+
+            {/* Data Limitations Notice */}
+            {latest?.dataLimitations && (
+              <div className="bg-muted/50 rounded-2xl p-4 border border-border flex items-start gap-3">
+                <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-foreground mb-1">{t('results.dataLimitations')}</p>
+                  <p className="text-sm text-muted-foreground">{latest.dataLimitations}</p>
+                </div>
               </div>
             )}
 
@@ -158,20 +178,25 @@ const HealthChart = () => {
                   </div>
                 </div>
 
-                {/* Diseases */}
+                {/* Diseases with reasoning */}
                 {latest.diseases?.length > 0 && (
                   <div className="bg-card rounded-2xl p-6 border border-border card-medical">
                     <h2 className="text-lg font-bold text-foreground mb-4">{t('results.diseases')}</h2>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {latest.diseases.map((d: any, i: number) => (
-                        <div key={i} className="flex items-center justify-between">
-                          <span className="text-sm text-foreground">{d.name}</span>
-                          <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                              <div className={`h-full rounded-full ${d.risk <= 30 ? 'bg-green-500' : d.risk <= 60 ? 'bg-yellow-500' : 'bg-red-500'}`} style={{ width: `${d.risk}%` }} />
+                        <div key={i} className="bg-muted/30 rounded-xl p-3 border border-border">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-sm font-medium text-foreground">{d.name}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                                <div className={`h-full rounded-full ${d.risk <= 30 ? 'bg-green-500' : d.risk <= 60 ? 'bg-yellow-500' : 'bg-red-500'}`} style={{ width: `${d.risk}%` }} />
+                              </div>
+                              <span className="text-xs text-muted-foreground w-8 text-right">{d.risk}%</span>
                             </div>
-                            <span className="text-xs text-muted-foreground w-8 text-right">{d.risk}%</span>
                           </div>
+                          {d.reasoning && (
+                            <p className="text-xs text-muted-foreground mt-1">{d.reasoning}</p>
+                          )}
                         </div>
                       ))}
                     </div>
