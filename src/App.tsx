@@ -14,6 +14,7 @@ import Auth from "./pages/Auth";
 import HealthChart from "./pages/HealthChart";
 import About from "./pages/About";
 import Medicine from "./pages/Medicine";
+import Feedback from "./pages/Feedback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/chart" element={<HealthChart />} />
               <Route path="/about" element={<About />} />
               <Route path="/medicine" element={<Medicine />} />
+              <Route path="/feedback" element={<Feedback />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Footer />
