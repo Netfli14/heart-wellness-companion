@@ -14,7 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      feedback: {
+        Row: {
+          created_at: string
+          id: string
+          likes_count: number
+          message: string
+          user_email: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          likes_count?: number
+          message: string
+          user_email: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          likes_count?: number
+          message?: string
+          user_email?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      feedback_likes: {
+        Row: {
+          created_at: string
+          feedback_id: string
+          id: string
+          user_email: string
+        }
+        Insert: {
+          created_at?: string
+          feedback_id: string
+          id?: string
+          user_email: string
+        }
+        Update: {
+          created_at?: string
+          feedback_id?: string
+          id?: string
+          user_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feedback_likes_feedback_id_fkey"
+            columns: ["feedback_id"]
+            isOneToOne: false
+            referencedRelation: "feedback"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
