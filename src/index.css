@@ -6,91 +6,99 @@
 
 @layer base {
   :root {
-    --background: 180 10% 98%;
-    --foreground: 200 25% 10%;
+    --background: 220 20% 97%;
+    --foreground: 220 25% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 200 25% 10%;
+    --card-foreground: 220 25% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 200 25% 10%;
+    --popover-foreground: 220 25% 8%;
 
-    --primary: 174 62% 38%;
+    --primary: 220 70% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 180 15% 93%;
-    --secondary-foreground: 200 25% 15%;
+    --secondary: 220 15% 93%;
+    --secondary-foreground: 220 25% 15%;
 
-    --muted: 180 10% 94%;
-    --muted-foreground: 200 10% 45%;
+    --muted: 220 10% 94%;
+    --muted-foreground: 220 10% 45%;
 
-    --accent: 0 78% 55%;
+    --accent: 280 60% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 180 15% 88%;
-    --input: 180 15% 88%;
-    --ring: 174 62% 38%;
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 220 70% 50%;
 
     --radius: 0.75rem;
 
-    --hero-gradient: linear-gradient(135deg, hsl(174, 62%, 38%), hsl(190, 70%, 30%));
-    --card-shadow: 0 4px 24px -4px hsl(174 62% 38% / 0.1);
-    --card-shadow-hover: 0 8px 32px -4px hsl(174 62% 38% / 0.2);
+    --hero-gradient: linear-gradient(135deg, hsl(220, 70%, 50%), hsl(280, 60%, 55%));
+    --card-shadow: 0 4px 24px -4px hsl(220 70% 50% / 0.08);
+    --card-shadow-hover: 0 8px 32px -4px hsl(220 70% 50% / 0.15);
+
+    --mental: 280 60% 55%;
+    --mental-foreground: 0 0% 100%;
+    --mental-gradient: linear-gradient(135deg, hsl(280, 60%, 55%), hsl(320, 50%, 50%));
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 174 62% 38%;
+    --sidebar-primary: 220 70% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 15% 93%;
-    --sidebar-accent-foreground: 200 25% 15%;
-    --sidebar-border: 180 15% 88%;
-    --sidebar-ring: 174 62% 38%;
+    --sidebar-accent: 220 15% 93%;
+    --sidebar-accent-foreground: 220 25% 15%;
+    --sidebar-border: 220 15% 88%;
+    --sidebar-ring: 220 70% 50%;
   }
 
   .dark {
-    --background: 200 25% 8%;
-    --foreground: 180 10% 94%;
+    --background: 220 25% 6%;
+    --foreground: 220 10% 94%;
 
-    --card: 200 20% 12%;
-    --card-foreground: 180 10% 94%;
+    --card: 220 20% 10%;
+    --card-foreground: 220 10% 94%;
 
-    --popover: 200 20% 12%;
-    --popover-foreground: 180 10% 94%;
+    --popover: 220 20% 10%;
+    --popover-foreground: 220 10% 94%;
 
-    --primary: 174 62% 45%;
+    --primary: 220 70% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 200 15% 18%;
-    --secondary-foreground: 180 10% 90%;
+    --secondary: 220 15% 16%;
+    --secondary-foreground: 220 10% 90%;
 
-    --muted: 200 15% 18%;
-    --muted-foreground: 200 10% 55%;
+    --muted: 220 15% 16%;
+    --muted-foreground: 220 10% 55%;
 
-    --accent: 0 78% 55%;
+    --accent: 280 60% 60%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 15% 20%;
-    --input: 200 15% 20%;
-    --ring: 174 62% 45%;
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 220 70% 55%;
 
-    --hero-gradient: linear-gradient(135deg, hsl(174, 62%, 30%), hsl(200, 50%, 15%));
+    --hero-gradient: linear-gradient(135deg, hsl(220, 70%, 40%), hsl(280, 50%, 35%));
     --card-shadow: 0 4px 24px -4px hsl(0 0% 0% / 0.3);
-    --card-shadow-hover: 0 8px 32px -4px hsl(174 62% 45% / 0.2);
+    --card-shadow-hover: 0 8px 32px -4px hsl(220 70% 55% / 0.2);
 
-    --sidebar-background: 200 25% 8%;
-    --sidebar-foreground: 180 10% 94%;
-    --sidebar-primary: 174 62% 45%;
+    --mental: 280 60% 60%;
+    --mental-foreground: 0 0% 100%;
+    --mental-gradient: linear-gradient(135deg, hsl(280, 60%, 45%), hsl(320, 50%, 40%));
+
+    --sidebar-background: 220 25% 6%;
+    --sidebar-foreground: 220 10% 94%;
+    --sidebar-primary: 220 70% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 200 15% 18%;
-    --sidebar-accent-foreground: 180 10% 90%;
-    --sidebar-border: 200 15% 20%;
-    --sidebar-ring: 174 62% 45%;
+    --sidebar-accent: 220 15% 16%;
+    --sidebar-accent-foreground: 220 10% 90%;
+    --sidebar-border: 220 15% 18%;
+    --sidebar-ring: 220 70% 55%;
   }
 }
 
@@ -111,6 +119,9 @@
   .hero-gradient {
     background: var(--hero-gradient);
   }
+  .mental-gradient {
+    background: var(--mental-gradient);
+  }
   .card-medical {
     box-shadow: var(--card-shadow);
     transition: box-shadow 0.3s ease;
@@ -121,9 +132,6 @@
   .pulse-dot {
     animation: pulse-animation 2s infinite;
   }
-  .ecg-line {
-    animation: ecg-draw 2s ease-in-out infinite;
-  }
 }
 
 @keyframes pulse-animation {
@@ -131,31 +139,23 @@
   50% { transform: scale(1.2); opacity: 0.7; }
 }
 
-@keyframes ecg-draw {
-  0% { stroke-dashoffset: 1000; }
-  100% { stroke-dashoffset: 0; }
-}
-
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in-up {
-  animation: fade-in-up 0.6s ease-out forwards;
+.animate-fade-in-up { animation: fade-in-up 0.6s ease-out forwards; }
+.animate-fade-in-up-delay-1 { animation: fade-in-up 0.6s ease-out 0.1s forwards; opacity: 0; }
+.animate-fade-in-up-delay-2 { animation: fade-in-up 0.6s ease-out 0.2s forwards; opacity: 0; }
+.animate-fade-in-up-delay-3 { animation: fade-in-up 0.6s ease-out 0.3s forwards; opacity: 0; }
+
+@keyframes burn {
+  0% { filter: brightness(1) sepia(0); transform: scale(1); opacity: 1; }
+  30% { filter: brightness(1.5) sepia(0.8); transform: scale(1.02); }
+  60% { filter: brightness(2) sepia(1) saturate(3); transform: scale(0.98) rotate(1deg); }
+  100% { filter: brightness(3) sepia(1) saturate(5); transform: scale(0.9) rotate(2deg); opacity: 0; }
 }
 
-.animate-fade-in-up-delay-1 {
-  animation: fade-in-up 0.6s ease-out 0.1s forwards;
-  opacity: 0;
-}
-
-.animate-fade-in-up-delay-2 {
-  animation: fade-in-up 0.6s ease-out 0.2s forwards;
-  opacity: 0;
-}
-
-.animate-fade-in-up-delay-3 {
-  animation: fade-in-up 0.6s ease-out 0.3s forwards;
-  opacity: 0;
+.animate-burn {
+  animation: burn 2s ease-in-out forwards;
 }

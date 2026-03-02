@@ -1,43 +1,42 @@
 import { useState } from 'react';
-import { Heart } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Auth = () => {
   const { t } = useLanguage();
+  const { signUp, signIn } = useAuth();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     email: '', password: '', fullName: '', age: '', gender: '',
     city: '', chronicDiseases: '', allergies: '', badHabits: '', bodyFeatures: '',
+    workHours: '', stressResilience: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
-      const stored = localStorage.getItem('cardiocheck_user');
-      if (stored) {
-        const user = JSON.parse(stored);
-        if (user.email === form.email) {
-          navigate('/chart');
-          return;
-        }
+    setLoading(true);
+    try {
+      if (isLogin) {
+        const { error } = await signIn(form.email, form.password);
+        if (error) { toast.error(error.message); return; }
+        navigate('/analysis');
+      } else {
+        const { error } = await signUp(form.email, form.password, form);
+        if (error) { toast.error(error.message); return; }
+        toast.success(t('auth.checkEmail'));
+        navigate('/');
       }
-      localStorage.setItem('cardiocheck_user', JSON.stringify({ email: form.email, fullName: 'User' }));
-      navigate('/chart');
-    } else {
-      localStorage.setItem('cardiocheck_user', JSON.stringify({
-        email: form.email, fullName: form.fullName, age: form.age,
-        gender: form.gender, city: form.city,
-        chronicDiseases: form.chronicDiseases, allergies: form.allergies,
-        badHabits: form.badHabits, bodyFeatures: form.bodyFeatures,
-      }));
-      navigate('/analysis');
+    } finally {
+      setLoading(false);
     }
   };
 
   const update = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
-
   const inputClass = "w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring";
 
   return (
@@ -45,8 +44,8 @@ const Auth = () => {
       <div className="w-full max-w-lg mx-auto px-4">
         <div className="bg-card rounded-2xl p-8 border border-border card-medical">
           <div className="flex items-center justify-center gap-2 mb-6">
-            <Heart className="w-8 h-8 text-primary fill-primary" />
-            <span className="text-xl font-bold text-foreground">HeartAI</span>
+            <Sparkles className="w-8 h-8 text-primary" />
+            <span className="text-xl font-bold text-foreground">CVX</span>
           </div>
 
           <h2 className="text-2xl font-bold text-foreground text-center mb-6">
@@ -80,6 +79,21 @@ const Auth = () => {
                     <input type="text" required value={form.city} onChange={e => update('city', e.target.value)} className={inputClass} />
                   </div>
                 </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm text-muted-foreground mb-1">{t('auth.workHours')}</label>
+                    <input type="number" min="0" max="168" value={form.workHours} onChange={e => update('workHours', e.target.value)} className={inputClass} placeholder="40" />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-muted-foreground mb-1">{t('auth.stressResilience')}</label>
+                    <select value={form.stressResilience} onChange={e => update('stressResilience', e.target.value)} className={inputClass}>
+                      <option value="">—</option>
+                      <option value="low">{t('auth.stressResilience.low')}</option>
+                      <option value="medium">{t('auth.stressResilience.medium')}</option>
+                      <option value="high">{t('auth.stressResilience.high')}</option>
+                    </select>
+                  </div>
+                </div>
                 <div>
                   <label className="block text-sm text-muted-foreground mb-1">{t('auth.chronicDiseases')}</label>
                   <input type="text" value={form.chronicDiseases} onChange={e => update('chronicDiseases', e.target.value)} className={inputClass} placeholder={t('auth.chronicDiseases.placeholder')} />
@@ -105,10 +119,11 @@ const Auth = () => {
             </div>
             <div>
               <label className="block text-sm text-muted-foreground mb-1">{t('auth.password')}</label>
-              <input type="password" required value={form.password} onChange={e => update('password', e.target.value)} className={inputClass} />
+              <input type="password" required minLength={6} value={form.password} onChange={e => update('password', e.target.value)} className={inputClass} />
             </div>
-            <button type="submit" className="w-full hero-gradient text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity mt-2">
-              {isLogin ? t('auth.submit.login') : t('auth.submit.register')}
+            <button type="submit" disabled={loading}
+              className="w-full hero-gradient text-primary-foreground py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity mt-2 disabled:opacity-50">
+              {loading ? '...' : isLogin ? t('auth.submit.login') : t('auth.submit.register')}
             </button>
           </form>
 
