@@ -1,8 +1,9 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Heart, Sun, Moon, Globe, Menu, X, LogOut } from 'lucide-react';
+import { Sparkles, Sun, Moon, Globe, Menu, X, LogOut } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Lang } from '@/i18n/translations';
 
 const langLabels: Record<Lang, string> = { ru: 'РУС', kz: 'ҚАЗ', en: 'ENG' };
@@ -11,21 +12,14 @@ const langOptions: Lang[] = ['ru', 'kz', 'en'];
 const Navbar = () => {
   const { t, lang, setLang } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const { user, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem('cardiocheck_user');
-    if (stored) setUser(JSON.parse(stored));
-  }, [location]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('cardiocheck_user');
-    localStorage.removeItem('cardiocheck_analyses');
-    setUser(null);
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
 
@@ -33,8 +27,9 @@ const Navbar = () => {
     { to: '/', label: t('nav.home') },
     { to: '/analysis', label: t('nav.analysis') },
     { to: '/chart', label: t('nav.chart') },
+    { to: '/chat', label: t('nav.chat') },
+    { to: '/diary', label: t('nav.diary') },
     { to: '/hospitals', label: t('nav.hospitals') },
-    { to: '/medicine', label: t('nav.medicine') },
     { to: '/feedback', label: t('nav.feedback') },
     { to: '/about', label: t('nav.about') },
   ];
@@ -45,9 +40,9 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 text-primary font-bold text-xl">
-            <Heart className="w-6 h-6 fill-primary" />
-            <span className="font-display hidden sm:inline">HeartAI</span>
+          <Link to="/" className="flex items-center gap-2 text-primary font-bold text-lg">
+            <Sparkles className="w-6 h-6" />
+            <span className="font-display hidden sm:inline">CVX</span>
           </Link>
 
           <div className="hidden lg:flex items-center gap-1">
@@ -84,7 +79,7 @@ const Navbar = () => {
 
             {user ? (
               <div className="hidden sm:flex items-center gap-2">
-                <span className="text-sm text-foreground font-medium truncate max-w-[120px]">{user.fullName || user.email}</span>
+                <span className="text-sm text-foreground font-medium truncate max-w-[120px]">{profile?.full_name || user.email}</span>
                 <button onClick={handleLogout} className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors" title={t('nav.logout')}>
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -112,7 +107,7 @@ const Navbar = () => {
               </Link>
             ))}
             {user ? (
-              <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-accent hover:bg-muted">
+              <button onClick={() => { handleLogout(); setMobileOpen(false); }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-destructive hover:bg-muted">
                 {t('nav.logout')}
               </button>
             ) : (

@@ -1,37 +1,33 @@
 import { Link } from 'react-router-dom';
-import { Heart, Activity, FileText, MapPin, Shield, Award } from 'lucide-react';
+import { Heart, Brain, Activity, FileText, MapPin, Shield, Award, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import heroImage from '@/assets/hero-heart.jpg';
-import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import heroImage from '@/assets/hero-cvx.jpg';
 
 const Index = () => {
   const { t } = useLanguage();
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('cardiocheck_user');
-    if (stored) setUser(JSON.parse(stored));
-  }, []);
+  const { user } = useAuth();
 
   const features = [
-    { icon: Heart, title: t('features.symptoms.title'), desc: t('features.symptoms.desc'), color: 'text-accent' },
-    { icon: Activity, title: t('features.blood.title'), desc: t('features.blood.desc'), color: 'text-primary' },
-    { icon: FileText, title: t('features.chart.title'), desc: t('features.chart.desc'), color: 'text-primary' },
+    { icon: Heart, title: t('features.heart.title'), desc: t('features.heart.desc'), color: 'text-primary' },
+    { icon: Brain, title: t('features.mental.title'), desc: t('features.mental.desc'), color: 'text-accent' },
+    { icon: Activity, title: t('features.chart.title'), desc: t('features.chart.desc'), color: 'text-primary' },
     { icon: MapPin, title: t('features.hospitals.title'), desc: t('features.hospitals.desc'), color: 'text-accent' },
   ];
 
   return (
     <div className="min-h-screen">
+      {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Heart Health" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
+          <img src={heroImage} alt="Clinical Vision eXpert" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/30" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-32">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-6 animate-fade-in-up">
-              <Heart className="w-8 h-8 text-primary fill-primary pulse-dot" />
-              <span className="text-sm font-semibold text-primary uppercase tracking-wider">HeartAI</span>
+              <Sparkles className="w-8 h-8 text-primary pulse-dot" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">Clinical Vision eXpert</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6 animate-fade-in-up-delay-1">
               {t('hero.title')}
@@ -42,15 +38,14 @@ const Index = () => {
             <div className="flex flex-wrap gap-4 animate-fade-in-up-delay-3">
               <Link
                 to={user ? '/analysis' : '/auth'}
-                className="hero-gradient px-6 py-3 rounded-xl font-semibold text-primary-foreground hover:opacity-90 transition-opacity shadow-lg"
+                className="hero-gradient px-8 py-3.5 rounded-xl font-semibold text-primary-foreground hover:opacity-90 transition-opacity shadow-lg"
               >
                 {user ? t('nav.analysis') : t('hero.cta')}
               </Link>
-              <a href="#features" className="px-6 py-3 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors">
+              <a href="#features" className="px-8 py-3.5 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors">
                 {t('hero.cta2')}
               </a>
             </div>
-            {/* Credibility badges */}
             <div className="flex items-center gap-4 mt-8 animate-fade-in-up-delay-3">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Shield className="w-4 h-4 text-primary" />
@@ -65,6 +60,7 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Features */}
       <section id="features" className="py-20 bg-muted/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl font-bold text-center text-foreground mb-12">{t('features.title')}</h2>

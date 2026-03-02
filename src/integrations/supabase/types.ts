@@ -14,6 +14,121 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_members: {
+        Row: {
+          id: string
+          joined_at: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_rooms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_anonymous: boolean
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_anonymous?: boolean
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_anonymous?: boolean
+          name?: string | null
+        }
+        Relationships: []
+      }
+      diary_entries: {
+        Row: {
+          content: string
+          created_at: string
+          guided_answers: Json | null
+          id: string
+          is_burned: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          guided_answers?: Json | null
+          id?: string
+          is_burned?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          guided_answers?: Json | null
+          id?: string
+          is_burned?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           created_at: string
@@ -21,6 +136,7 @@ export type Database = {
           likes_count: number
           message: string
           user_email: string
+          user_id: string | null
           user_name: string
         }
         Insert: {
@@ -29,6 +145,7 @@ export type Database = {
           likes_count?: number
           message: string
           user_email: string
+          user_id?: string | null
           user_name: string
         }
         Update: {
@@ -37,6 +154,7 @@ export type Database = {
           likes_count?: number
           message?: string
           user_email?: string
+          user_id?: string | null
           user_name?: string
         }
         Relationships: []
@@ -47,18 +165,21 @@ export type Database = {
           feedback_id: string
           id: string
           user_email: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
           feedback_id: string
           id?: string
           user_email: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
           feedback_id?: string
           id?: string
           user_email?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -69,6 +190,84 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      health_analyses: {
+        Row: {
+          analysis_type: string
+          created_at: string
+          id: string
+          result: Json
+          user_id: string
+        }
+        Insert: {
+          analysis_type?: string
+          created_at?: string
+          id?: string
+          result?: Json
+          user_id: string
+        }
+        Update: {
+          analysis_type?: string
+          created_at?: string
+          id?: string
+          result?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          allergies: string | null
+          bad_habits: string | null
+          body_features: string | null
+          chronic_diseases: string | null
+          city: string | null
+          created_at: string
+          email: string
+          full_name: string
+          gender: string | null
+          id: string
+          stress_resilience: string | null
+          updated_at: string
+          user_id: string
+          work_hours_per_week: number | null
+        }
+        Insert: {
+          age?: number | null
+          allergies?: string | null
+          bad_habits?: string | null
+          body_features?: string | null
+          chronic_diseases?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          gender?: string | null
+          id?: string
+          stress_resilience?: string | null
+          updated_at?: string
+          user_id: string
+          work_hours_per_week?: number | null
+        }
+        Update: {
+          age?: number | null
+          allergies?: string | null
+          bad_habits?: string | null
+          body_features?: string | null
+          chronic_diseases?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          gender?: string | null
+          id?: string
+          stress_resilience?: string | null
+          updated_at?: string
+          user_id?: string
+          work_hours_per_week?: number | null
+        }
+        Relationships: []
       }
     }
     Views: {
