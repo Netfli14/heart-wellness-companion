@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Heart, Brain, Activity, FileText, MapPin, Shield, Award, Sparkles } from 'lucide-react';
+import { Heart, Brain, Activity, MapPin, Shield, Award, Sparkles, Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import heroImage from '@/assets/hero-cvx.jpg';
+import TubesCursor from '@/components/ui/tubes-cursor';
 
 const Index = () => {
   const { t } = useLanguage();
@@ -12,7 +12,7 @@ const Index = () => {
     { icon: Heart, title: t('features.heart.title'), desc: t('features.heart.desc'), color: 'text-primary' },
     { icon: Brain, title: t('features.mental.title'), desc: t('features.mental.desc'), color: 'text-accent' },
     { icon: Activity, title: t('features.chart.title'), desc: t('features.chart.desc'), color: 'text-primary' },
-    { icon: MapPin, title: t('features.hospitals.title'), desc: t('features.hospitals.desc'), color: 'text-accent' },
+    { icon: Bot, title: t('features.aiDoctor.title'), desc: t('features.aiDoctor.desc'), color: 'text-accent' },
   ];
 
   return (
@@ -20,8 +20,8 @@ const Index = () => {
       {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroImage} alt="Clinical Vision eXpert" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/30" />
+          <TubesCursor className="w-full h-full" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-transparent" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-32">
           <div className="max-w-2xl">
@@ -42,9 +42,12 @@ const Index = () => {
               >
                 {user ? t('nav.analysis') : t('hero.cta')}
               </Link>
-              <a href="#features" className="px-8 py-3.5 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors">
-                {t('hero.cta2')}
-              </a>
+              <Link
+                to="/ai-doctor"
+                className="px-8 py-3.5 rounded-xl font-semibold border border-border text-foreground hover:bg-muted transition-colors"
+              >
+                {t('features.aiDoctor.title')}
+              </Link>
             </div>
             <div className="flex items-center gap-4 mt-8 animate-fade-in-up-delay-3">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
