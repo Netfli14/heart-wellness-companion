@@ -23,16 +23,24 @@ const Navbar = () => {
     navigate('/');
   };
 
-  const links = [
+  // Public links (always visible)
+  const publicLinks = [
     { to: '/', label: t('nav.home') },
+    { to: '/ai-doctor', label: t('nav.aiDoctor') },
+    { to: '/about', label: t('nav.about') },
+  ];
+
+  // Auth-only links
+  const authLinks = [
     { to: '/analysis', label: t('nav.analysis') },
     { to: '/chart', label: t('nav.chart') },
     { to: '/chat', label: t('nav.chat') },
     { to: '/diary', label: t('nav.diary') },
     { to: '/hospitals', label: t('nav.hospitals') },
     { to: '/feedback', label: t('nav.feedback') },
-    { to: '/about', label: t('nav.about') },
   ];
+
+  const links = user ? [...publicLinks.slice(0, 1), ...authLinks, ...publicLinks.slice(1)] : publicLinks;
 
   const isActive = (path: string) => location.pathname === path;
 

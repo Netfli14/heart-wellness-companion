@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Lock, Plus, Flame, RotateCcw, BookOpen, PenLine } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import { FireSphere } from '@/components/ui/fire-sphere';
 
 const guidedQuestions = [
   'diary.q1', 'diary.q2', 'diary.q3', 'diary.q4', 'diary.q5',
@@ -47,12 +48,13 @@ const Diary = () => {
 
   const burnEntry = async (id: string) => {
     setBurning(id);
+    // Let the fire animation play for 3 seconds
     setTimeout(async () => {
       await supabase.from('diary_entries').update({ is_burned: true }).eq('id', id);
       fetchEntries();
       setBurning(null);
       toast.success(t('diary.burned'));
-    }, 2000);
+    }, 3000);
   };
 
   const restoreEntry = async (id: string) => {
@@ -96,7 +98,6 @@ const Diary = () => {
               className="bg-card rounded-2xl p-6 border border-border card-medical space-y-4 overflow-hidden">
               <h2 className="text-lg font-bold text-foreground">{t('diary.newEntry')}</h2>
 
-              {/* Guided questions */}
               {guidedQuestions.map(q => (
                 <div key={q}>
                   <label className="block text-sm text-muted-foreground mb-1">{t(q)}</label>
@@ -105,7 +106,6 @@ const Diary = () => {
                 </div>
               ))}
 
-              {/* Free writing */}
               <div>
                 <label className="block text-sm text-muted-foreground mb-1">{t('diary.freeWrite')}</label>
                 <textarea value={content} onChange={e => setContent(e.target.value)}
@@ -126,36 +126,66 @@ const Diary = () => {
             <p className="text-center text-muted-foreground py-12">{t('diary.empty')}</p>
           ) : (
             entries.map(entry => (
-              <div key={entry.id} className={`bg-card rounded-2xl p-5 border border-border card-medical relative ${
-                burning === entry.id ? 'animate-burn' : ''
-              } ${entry.is_burned ? 'opacity-40' : ''}`}>
-                <div className="flex justify-between items-start mb-3">
-                  <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString()}</p>
-                  <div className="flex gap-2">
-                    {entry.is_burned ? (
-                      <button onClick={() => restoreEntry(entry.id)} className="p-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground" title={t('diary.restore')}>
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
-                    ) : (
-                      <button onClick={() => burnEntry(entry.id)} className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20" title={t('diary.burn')}>
-                        <Flame className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-                {!entry.is_burned && (
-                  <>
-                    {entry.content && <p className="text-sm text-foreground whitespace-pre-line">{entry.content}</p>}
-                    {entry.guided_answers && Object.keys(entry.guided_answers).length > 0 && (
-                      <div className="mt-3 space-y-1">
-                        {Object.entries(entry.guided_answers).map(([q, a]: any) => (
-                          a && <p key={q} className="text-xs text-muted-foreground"><span className="font-medium">{t(q)}:</span> {a}</p>
-                        ))}
+              <div key={entry.id} className={`relative ${entry.is_burned ? 'opacity-40' : ''}`}>
+                {/* Fire sphere overlay when burning */}
+                <AnimatePresence>
+                  {burning === entry.id && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.3 }}
+                      transition={{ duration: 0.5 }}
+                      className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl overflow-hidden"
+                      style={{ background: 'rgba(0,0,0,0.85)' }}
+                    >
+                      <div className="w-48 h-48">
+                        <FireSphere
+                          bloomStrength={2.5}
+                          bloomRadius={1.0}
+                          color0={[255, 60, 0]}
+                          color1={[255, 140, 20]}
+                          animate
+                        />
                       </div>
-                    )}
-                  </>
-                )}
-                {entry.is_burned && <p className="text-sm text-muted-foreground italic text-center">{t('diary.burnedText')}</p>}
+                      <p className="absolute bottom-4 text-orange-400 font-bold text-sm animate-pulse">
+                        🔥 {t('diary.burn')}...
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <div className={`bg-card rounded-2xl p-5 border border-border card-medical relative transition-all duration-300 ${
+                  burning === entry.id ? 'scale-95' : ''
+                }`}>
+                  <div className="flex justify-between items-start mb-3">
+                    <p className="text-xs text-muted-foreground">{new Date(entry.created_at).toLocaleDateString()}</p>
+                    <div className="flex gap-2">
+                      {entry.is_burned ? (
+                        <button onClick={() => restoreEntry(entry.id)} className="p-1.5 rounded-lg bg-muted text-muted-foreground hover:text-foreground" title={t('diary.restore')}>
+                          <RotateCcw className="w-4 h-4" />
+                        </button>
+                      ) : (
+                        <button onClick={() => burnEntry(entry.id)} className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500/20" title={t('diary.burn')}
+                          disabled={burning !== null}>
+                          <Flame className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {!entry.is_burned && (
+                    <>
+                      {entry.content && <p className="text-sm text-foreground whitespace-pre-line">{entry.content}</p>}
+                      {entry.guided_answers && Object.keys(entry.guided_answers).length > 0 && (
+                        <div className="mt-3 space-y-1">
+                          {Object.entries(entry.guided_answers).map(([q, a]: any) => (
+                            a && <p key={q} className="text-xs text-muted-foreground"><span className="font-medium">{t(q)}:</span> {a}</p>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {entry.is_burned && <p className="text-sm text-muted-foreground italic text-center">{t('diary.burnedText')}</p>}
+                </div>
               </div>
             ))
           )}

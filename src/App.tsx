@@ -19,6 +19,7 @@ import Diary from "./pages/Diary";
 import About from "./pages/About";
 import Medicine from "./pages/Medicine";
 import Feedback from "./pages/Feedback";
+import AiDoctor from "./pages/AiDoctor";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/medicine" element={<Medicine />} />
                 <Route path="/feedback" element={<Feedback />} />
+                <Route path="/ai-doctor" element={<AiDoctor />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Footer />

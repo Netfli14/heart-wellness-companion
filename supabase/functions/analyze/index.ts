@@ -23,26 +23,30 @@ serve(async (req) => {
       const hasHeartRate = activity?.heartRate && activity.heartRate.toString().trim() !== '';
       const hasBloodData = bloodData && Object.values(bloodData).some((v: any) => v !== '' && v != null);
 
-      systemPrompt = `You are a senior cardiologist AI assistant for Clinical Vision eXpert (CVX). Provide analysis based on ESC, AHA/ACC, WHO guidelines.
+      systemPrompt = `You are a senior cardiologist AI assistant for Clinical Vision eXpert (CVX). Provide EXTREMELY DETAILED and COMPREHENSIVE analysis based on ESC, AHA/ACC, WHO guidelines.
 
 CRITICAL: ENTIRE response in ${langName}. Every field, every word.
 
 RULES:
-1. Reference specific medical guidelines. For each disease provide a link to a relevant study.
+1. Reference specific medical guidelines with links to relevant studies for EACH disease.
 2. "symptomsChartScore" = HEALTH score (0=critical, 100=excellent). Must be CONSISTENT with verdict/risk.
 3. "riskScore" = RISK (0=no risk, 100=critical). Inverse of health score.
 4. "normalHealthScore" = expected healthy score for this age/gender (78-95). Justify in "normalScoreJustification".
-${!hasHeartRate ? `5. Patient DID NOT provide heart rate. DO NOT diagnose heart-rate-dependent conditions (tachycardia, bradycardia, arrhythmia).` : ''}
-${!hasBloodData ? `6. Patient DID NOT provide blood data. DO NOT diagnose blood-test-dependent conditions (dyslipidemia, diabetes). Set bloodChartScore to null.` : ''}
+5. Provide AT LEAST 5-8 short-term measures with specific actionable steps (dosages, frequencies, exercises).
+6. Provide AT LEAST 5-8 long-term measures with lifestyle changes, monitoring schedules, and prevention strategies.
+7. The verdict MUST be at least 300 words, covering: current state assessment, risk factor analysis, physiological explanation, prognosis, and personalized recommendations.
+8. For each disease, provide detailed reasoning with pathophysiology explanation.
+${!hasHeartRate ? `9. Patient DID NOT provide heart rate. DO NOT diagnose heart-rate-dependent conditions (tachycardia, bradycardia, arrhythmia).` : ''}
+${!hasBloodData ? `10. Patient DID NOT provide blood data. DO NOT diagnose blood-test-dependent conditions (dyslipidemia, diabetes). Set bloodChartScore to null.` : ''}
 
 Response MUST be valid JSON:
 {
-  "verdict": "detailed verdict in ${langName}",
+  "verdict": "VERY detailed verdict (300+ words) in ${langName}",
   "riskScore": <0-100>,
   "riskCategory": "low|moderate|high|critical",
-  "shortTermMeasures": ["..."],
-  "longTermMeasures": ["..."],
-  "diseases": [{"name": "...", "risk": <0-100>, "reasoning": "..."}],
+  "shortTermMeasures": ["at least 5-8 specific actionable measures"],
+  "longTermMeasures": ["at least 5-8 detailed long-term strategies"],
+  "diseases": [{"name": "...", "risk": <0-100>, "reasoning": "detailed pathophysiology explanation"}],
   "needsHospital": <boolean>,
   "hospitalMessage": "...",
   "nextAnalysisMessage": "...",
@@ -74,21 +78,24 @@ Provide comprehensive cardiovascular assessment. RESPOND IN ${langName}.`;
     } else if (type === "mental_analysis") {
       const { answers, openText, userProfile } = data;
 
-      systemPrompt = `You are a clinical psychologist AI assistant for Clinical Vision eXpert (CVX). Provide mental health assessment.
+      systemPrompt = `You are a clinical psychologist AI assistant for Clinical Vision eXpert (CVX). Provide EXTREMELY DETAILED and COMPREHENSIVE mental health assessment.
 
 CRITICAL: ENTIRE response in ${langName}.
 
-Assess based on provided questionnaire answers and open text. Consider work-life balance, stress resilience, and overall mental state.
+Assess based on provided questionnaire answers and open text. Consider work-life balance, stress resilience, and overall mental state. 
+Be thorough: explain psychological mechanisms, coping strategies, and evidence-based interventions.
+Provide AT LEAST 5-8 short-term and 5-8 long-term measures with specific, actionable steps.
+The verdict MUST be at least 300 words covering: current psychological state, identified patterns, risk factors, coping mechanisms assessment, and personalized plan.
 
 Response MUST be valid JSON:
 {
-  "verdict": "detailed mental health assessment in ${langName}",
+  "verdict": "VERY detailed mental health assessment (300+ words) in ${langName}",
   "mentalScore": <0-100, where 100=excellent mental health, 0=critical>,
   "riskCategory": "low|moderate|high|critical",
-  "shortTermMeasures": ["immediate steps in ${langName}"],
-  "longTermMeasures": ["long-term strategies in ${langName}"],
-  "areas": [{"name": "area name in ${langName}", "score": <0-100>, "description": "brief assessment in ${langName}"}],
-  "recommendations": "personalized recommendations in ${langName}",
+  "shortTermMeasures": ["at least 5-8 specific immediate steps in ${langName}"],
+  "longTermMeasures": ["at least 5-8 detailed long-term strategies in ${langName}"],
+  "areas": [{"name": "area name in ${langName}", "score": <0-100>, "description": "detailed assessment in ${langName}"}],
+  "recommendations": "comprehensive personalized recommendations in ${langName}",
   "references": [{"title": "...", "url": "...", "relevance": "..."}]
 }`;
 
@@ -116,7 +123,7 @@ Response MUST be valid JSON:
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-3-pro-preview",
+        model: "openai/gpt-5.2",
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
       }),
     });

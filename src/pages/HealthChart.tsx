@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Lock, AlertTriangle, ArrowRight, Hospital, Plus, BookOpen, Info, Heart } from 'lucide-react';
+import { Lock, AlertTriangle, ArrowRight, Hospital, Plus, BookOpen, Info, Heart, Brain } from 'lucide-react';
 
 const HealthChart = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [analyses, setAnalyses] = useState<any[]>([]);
+  const [dashboardType, setDashboardType] = useState<'heart' | 'mental' | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('cvx_heart_analyses');
@@ -27,6 +29,37 @@ const HealthChart = () => {
         </div>
       </div>
     );
+  }
+
+  // Dashboard type selection
+  if (!dashboardType) {
+    return (
+      <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 w-full">
+          <h1 className="text-3xl font-bold text-center text-foreground mb-2">{t('chart.chooseType')}</h1>
+          <p className="text-center text-muted-foreground mb-8">{t('chart.chooseType.desc')}</p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <button onClick={() => setDashboardType('heart')}
+              className="bg-card rounded-2xl p-8 border border-border card-medical text-left hover:border-primary transition-colors group">
+              <Heart className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+              <h2 className="text-xl font-bold text-foreground mb-2">{t('chart.title')}</h2>
+              <p className="text-sm text-muted-foreground">{t('chart.heartDesc')}</p>
+            </button>
+            <button onClick={() => setDashboardType('mental')}
+              className="bg-card rounded-2xl p-8 border border-border card-medical text-left hover:border-accent transition-colors group">
+              <Brain className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
+              <h2 className="text-xl font-bold text-foreground mb-2">{t('mental.dashboard')}</h2>
+              <p className="text-sm text-muted-foreground">{t('chart.mentalDesc')}</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (dashboardType === 'mental') {
+    navigate('/mental-chart');
+    return null;
   }
 
   const latest = analyses.length > 0 ? analyses[analyses.length - 1] : null;
@@ -52,6 +85,7 @@ const HealthChart = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <button onClick={() => setDashboardType(null)} className="text-muted-foreground hover:text-foreground">←</button>
             <Heart className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">{t('chart.title')}</h1>
           </div>
@@ -69,7 +103,6 @@ const HealthChart = () => {
           </div>
         ) : (
           <>
-            {/* Symptoms Chart */}
             <div className="bg-card rounded-2xl p-6 border border-border card-medical">
               <h2 className="text-lg font-bold text-foreground mb-2">{t('chart.symptoms')}</h2>
               <p className="text-xs text-muted-foreground mb-4">{t('chart.xAxis')} · {t('chart.yAxis')}</p>
@@ -97,28 +130,17 @@ const HealthChart = () => {
             {bloodData.length > 0 && (
               <div className="bg-card rounded-2xl p-6 border border-border card-medical">
                 <h2 className="text-lg font-bold text-foreground mb-2">{t('chart.blood')}</h2>
-                <p className="text-xs text-muted-foreground mb-4">{t('chart.xAxis')} · {t('chart.yAxis')}</p>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={bloodData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                    <YAxis domain={[0, 100]} stroke="hsl(var(--muted-foreground))" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                    <YAxis domain={[0, 100]} stroke="hsl(var(--muted-foreground))" />
                     <Tooltip />
                     <Legend />
                     <Line type="monotone" dataKey="normal" name={t('chart.normal')} stroke="hsl(220, 70%, 50%)" strokeWidth={2} strokeDasharray="5 5" dot={false} />
                     <Line type="monotone" dataKey="user" name={t('chart.yours')} stroke="hsl(210, 78%, 55%)" strokeWidth={2} dot={{ r: 5, fill: 'hsl(210, 78%, 55%)' }} activeDot={{ r: 7 }} />
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
-            )}
-
-            {latest?.dataLimitations && (
-              <div className="bg-muted/50 rounded-2xl p-4 border border-border flex items-start gap-3">
-                <Info className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground mb-1">{t('results.dataLimitations')}</p>
-                  <p className="text-sm text-muted-foreground">{latest.dataLimitations}</p>
-                </div>
               </div>
             )}
 
@@ -218,18 +240,6 @@ const HealthChart = () => {
                     </div>
                   </div>
                 )}
-
-                <div className="bg-muted/50 rounded-2xl p-6 text-center">
-                  <p className="text-sm text-muted-foreground mb-3">{latest.nextAnalysisMessage || t('results.nextAnalysis')}</p>
-                  <div className="flex justify-center gap-3">
-                    <Link to="/analysis" className="flex items-center gap-2 hero-gradient px-5 py-2.5 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90">
-                      <ArrowRight className="w-4 h-4" /> {t('results.newAnalysis')}
-                    </Link>
-                    <Link to="/hospitals" className="flex items-center gap-2 bg-card border border-border px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:bg-muted">
-                      <Hospital className="w-4 h-4 text-primary" /> {t('results.viewHospitals')}
-                    </Link>
-                  </div>
-                </div>
               </>
             )}
           </>
