@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Heart, Brain, Activity, MapPin, Shield, Award, Sparkles, Bot } from 'lucide-react';
+import { Brain, Activity, MapPin, Shield, Award, Sparkles, Bot, Stethoscope, BookOpen, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import TubesCursor from '@/components/ui/tubes-cursor';
@@ -9,10 +9,17 @@ const Index = () => {
   const { user } = useAuth();
 
   const features = [
-    { icon: Heart, title: t('features.heart.title'), desc: t('features.heart.desc'), color: 'text-primary' },
+    { icon: Stethoscope, title: t('features.health.title'), desc: t('features.health.desc'), color: 'text-primary' },
     { icon: Brain, title: t('features.mental.title'), desc: t('features.mental.desc'), color: 'text-accent' },
     { icon: Activity, title: t('features.chart.title'), desc: t('features.chart.desc'), color: 'text-primary' },
     { icon: Bot, title: t('features.aiDoctor.title'), desc: t('features.aiDoctor.desc'), color: 'text-accent' },
+  ];
+
+  const instructions = [
+    { key: 'step1', icon: '📝' },
+    { key: 'step2', icon: '🔍' },
+    { key: 'step3', icon: '📊' },
+    { key: 'step4', icon: '📈' },
   ];
 
   return (
@@ -63,6 +70,22 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Instructions */}
+      <section className="py-20 bg-card/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <h2 className="text-3xl font-bold text-center text-foreground mb-12">{t('instructions.title')}</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {instructions.map((s) => (
+              <div key={s.key} className="bg-card rounded-2xl p-6 border border-border card-medical">
+                <span className="text-3xl mb-4 block">{s.icon}</span>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{t(`instructions.${s.key}.title`)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t(`instructions.${s.key}.desc`)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" className="py-20 bg-muted/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -72,7 +95,7 @@ const Index = () => {
               <div key={i} className="bg-card rounded-2xl p-6 card-medical border border-border">
                 <f.icon className={`w-10 h-10 mb-4 ${f.color}`} />
                 <h3 className="text-lg font-semibold text-foreground mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground">{f.desc}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
               </div>
             ))}
           </div>

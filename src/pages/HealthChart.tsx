@@ -3,14 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Lock, AlertTriangle, ArrowRight, Hospital, Plus, BookOpen, Info, Heart, Brain } from 'lucide-react';
+import { Lock, AlertTriangle, ArrowRight, Hospital, Plus, BookOpen, Info, Stethoscope, Brain, Pill } from 'lucide-react';
 
 const HealthChart = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState<any[]>([]);
-  const [dashboardType, setDashboardType] = useState<'heart' | 'mental' | null>(null);
+  const [dashboardType, setDashboardType] = useState<'health' | 'mental' | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem('cvx_heart_analyses');
@@ -31,7 +31,6 @@ const HealthChart = () => {
     );
   }
 
-  // Dashboard type selection
   if (!dashboardType) {
     return (
       <div className="min-h-screen pt-24 pb-16 flex items-center justify-center">
@@ -39,11 +38,11 @@ const HealthChart = () => {
           <h1 className="text-3xl font-bold text-center text-foreground mb-2">{t('chart.chooseType')}</h1>
           <p className="text-center text-muted-foreground mb-8">{t('chart.chooseType.desc')}</p>
           <div className="grid md:grid-cols-2 gap-6">
-            <button onClick={() => setDashboardType('heart')}
+            <button onClick={() => setDashboardType('health')}
               className="bg-card rounded-2xl p-8 border border-border card-medical text-left hover:border-primary transition-colors group">
-              <Heart className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+              <Stethoscope className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
               <h2 className="text-xl font-bold text-foreground mb-2">{t('chart.title')}</h2>
-              <p className="text-sm text-muted-foreground">{t('chart.heartDesc')}</p>
+              <p className="text-sm text-muted-foreground">{t('chart.healthDesc')}</p>
             </button>
             <button onClick={() => setDashboardType('mental')}
               className="bg-card rounded-2xl p-8 border border-border card-medical text-left hover:border-accent transition-colors group">
@@ -86,7 +85,7 @@ const HealthChart = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => setDashboardType(null)} className="text-muted-foreground hover:text-foreground">←</button>
-            <Heart className="w-8 h-8 text-primary" />
+            <Stethoscope className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">{t('chart.title')}</h1>
           </div>
           <Link to="/analysis" className="flex items-center gap-2 hero-gradient px-4 py-2 rounded-xl text-sm font-semibold text-primary-foreground hover:opacity-90">
@@ -186,23 +185,64 @@ const HealthChart = () => {
                   </div>
                 )}
 
+                {/* Measures - split into with/without meds */}
                 <div className="bg-card rounded-2xl p-6 border border-border card-medical">
                   <h2 className="text-lg font-bold text-foreground mb-4">{t('results.measures')}</h2>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="font-semibold text-sm mb-2 text-primary">{t('results.shortTerm')}</h3>
+                  
+                  {/* Short-term */}
+                  <h3 className="font-semibold text-foreground mb-3">{t('results.shortTerm')}</h3>
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Pill className="w-4 h-4 text-primary" />
+                        <h4 className="font-semibold text-sm text-primary">{t('results.withMeds')}</h4>
+                      </div>
                       <ul className="space-y-1.5">
-                        {(latest.shortTermMeasures || []).map((m: string, i: number) => (
+                        {(latest.shortTermWithMeds || latest.shortTermMeasures || []).map((m: string, i: number) => (
                           <li key={i} className="text-sm text-foreground flex items-start gap-2">
                             <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-sm mb-2 text-accent">{t('results.longTerm')}</h3>
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Stethoscope className="w-4 h-4 text-accent" />
+                        <h4 className="font-semibold text-sm text-accent">{t('results.withoutMeds')}</h4>
+                      </div>
                       <ul className="space-y-1.5">
-                        {(latest.longTermMeasures || []).map((m: string, i: number) => (
+                        {(latest.shortTermWithoutMeds || []).map((m: string, i: number) => (
+                          <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Long-term */}
+                  <h3 className="font-semibold text-foreground mb-3">{t('results.longTerm')}</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Pill className="w-4 h-4 text-primary" />
+                        <h4 className="font-semibold text-sm text-primary">{t('results.withMeds')}</h4>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {(latest.longTermWithMeds || latest.longTermMeasures || []).map((m: string, i: number) => (
+                          <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Stethoscope className="w-4 h-4 text-accent" />
+                        <h4 className="font-semibold text-sm text-accent">{t('results.withoutMeds')}</h4>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {(latest.longTermWithoutMeds || []).map((m: string, i: number) => (
                           <li key={i} className="text-sm text-foreground flex items-start gap-2">
                             <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
                           </li>

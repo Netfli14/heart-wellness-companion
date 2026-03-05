@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Lock, Brain, ArrowRight, Plus, BookOpen, Info } from 'lucide-react';
+import { Lock, Brain, ArrowRight, Plus, BookOpen, Info, Pill, Stethoscope } from 'lucide-react';
 
 const MentalChart = () => {
   const { t } = useLanguage();
@@ -101,28 +101,64 @@ const MentalChart = () => {
                   </div>
                 </div>
 
-                {/* Measures */}
+                {/* Measures - split into with/without meds */}
                 <div className="bg-card rounded-2xl p-6 border border-border card-medical">
                   <h2 className="text-lg font-bold text-foreground mb-4">{t('results.measures')}</h2>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="font-semibold text-sm mb-2 text-accent">{t('results.shortTerm')}</h3>
+                  
+                  <h3 className="font-semibold text-foreground mb-3">{t('results.shortTerm')}</h3>
+                  <div className="grid md:grid-cols-2 gap-4 mb-6">
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Pill className="w-4 h-4 text-accent" />
+                        <h4 className="font-semibold text-sm text-accent">{t('results.withMeds')}</h4>
+                      </div>
                       <ul className="space-y-1.5">
-                        {(latest.shortTermMeasures || []).map((m: string, i: number) => (
+                        {(latest.shortTermWithMeds || latest.shortTermMeasures || []).map((m: string, i: number) => (
                           <li key={i} className="text-sm text-foreground flex items-start gap-2">
-                            <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>
-                            {m}
+                            <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-sm mb-2 text-primary">{t('results.longTerm')}</h3>
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Stethoscope className="w-4 h-4 text-primary" />
+                        <h4 className="font-semibold text-sm text-primary">{t('results.withoutMeds')}</h4>
+                      </div>
                       <ul className="space-y-1.5">
-                        {(latest.longTermMeasures || []).map((m: string, i: number) => (
+                        {(latest.shortTermWithoutMeds || []).map((m: string, i: number) => (
                           <li key={i} className="text-sm text-foreground flex items-start gap-2">
-                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>
-                            {m}
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <h3 className="font-semibold text-foreground mb-3">{t('results.longTerm')}</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Pill className="w-4 h-4 text-accent" />
+                        <h4 className="font-semibold text-sm text-accent">{t('results.withMeds')}</h4>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {(latest.longTermWithMeds || latest.longTermMeasures || []).map((m: string, i: number) => (
+                          <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-muted/30 rounded-xl p-4 border border-border">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Stethoscope className="w-4 h-4 text-primary" />
+                        <h4 className="font-semibold text-sm text-primary">{t('results.withoutMeds')}</h4>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {(latest.longTermWithoutMeds || []).map((m: string, i: number) => (
+                          <li key={i} className="text-sm text-foreground flex items-start gap-2">
+                            <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">{i+1}</span>{m}
                           </li>
                         ))}
                       </ul>
