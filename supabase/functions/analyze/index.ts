@@ -23,7 +23,7 @@ serve(async (req) => {
       const hasHeartRate = activity?.heartRate && activity.heartRate.toString().trim() !== '';
       const hasBloodData = bloodData && Object.values(bloodData).some((v: any) => v !== '' && v != null);
 
-      systemPrompt = `You are a senior cardiologist AI assistant for Clinical Vision eXpert (CVX). Provide EXTREMELY DETAILED and COMPREHENSIVE analysis based on ESC, AHA/ACC, WHO guidelines.
+      systemPrompt = `You are a senior medical AI assistant for Clinical Vision eXpert (CVX). Provide EXTREMELY DETAILED and COMPREHENSIVE health analysis based on ESC, AHA/ACC, WHO guidelines.
 
 CRITICAL: ENTIRE response in ${langName}. Every field, every word.
 
@@ -32,20 +32,23 @@ RULES:
 2. "symptomsChartScore" = HEALTH score (0=critical, 100=excellent). Must be CONSISTENT with verdict/risk.
 3. "riskScore" = RISK (0=no risk, 100=critical). Inverse of health score.
 4. "normalHealthScore" = expected healthy score for this age/gender (78-95). Justify in "normalScoreJustification".
-5. Provide AT LEAST 5-8 short-term measures with specific actionable steps (dosages, frequencies, exercises).
-6. Provide AT LEAST 5-8 long-term measures with lifestyle changes, monitoring schedules, and prevention strategies.
-7. The verdict MUST be at least 300 words, covering: current state assessment, risk factor analysis, physiological explanation, prognosis, and personalized recommendations.
-8. For each disease, provide detailed reasoning with pathophysiology explanation.
-${!hasHeartRate ? `9. Patient DID NOT provide heart rate. DO NOT diagnose heart-rate-dependent conditions (tachycardia, bradycardia, arrhythmia).` : ''}
-${!hasBloodData ? `10. Patient DID NOT provide blood data. DO NOT diagnose blood-test-dependent conditions (dyslipidemia, diabetes). Set bloodChartScore to null.` : ''}
+5. The verdict MUST be at least 400 words. It should be DENSE with useful medical information — no filler, no repetition. Cover: current state assessment, risk factor analysis, physiological explanation, prognosis, and personalized recommendations.
+6. For EACH measure category, provide TWO variants:
+   - "withMeds": 5-8 measures WITH specific medications (drug names, dosages, frequencies, contraindications)
+   - "withoutMeds": 5-8 measures WITHOUT medications (lifestyle changes, exercises, diet modifications, supplements)
+7. For each disease, provide detailed reasoning with pathophysiology explanation.
+${!hasHeartRate ? `8. Patient DID NOT provide heart rate. DO NOT diagnose heart-rate-dependent conditions (tachycardia, bradycardia, arrhythmia).` : ''}
+${!hasBloodData ? `9. Patient DID NOT provide blood data. DO NOT diagnose blood-test-dependent conditions (dyslipidemia, diabetes). Set bloodChartScore to null.` : ''}
 
 Response MUST be valid JSON:
 {
-  "verdict": "VERY detailed verdict (300+ words) in ${langName}",
+  "verdict": "VERY detailed verdict (400+ words, no filler) in ${langName}",
   "riskScore": <0-100>,
   "riskCategory": "low|moderate|high|critical",
-  "shortTermMeasures": ["at least 5-8 specific actionable measures"],
-  "longTermMeasures": ["at least 5-8 detailed long-term strategies"],
+  "shortTermWithMeds": ["5-8 specific short-term measures WITH medications"],
+  "shortTermWithoutMeds": ["5-8 specific short-term measures WITHOUT medications"],
+  "longTermWithMeds": ["5-8 detailed long-term measures WITH medications"],
+  "longTermWithoutMeds": ["5-8 detailed long-term measures WITHOUT medications"],
   "diseases": [{"name": "...", "risk": <0-100>, "reasoning": "detailed pathophysiology explanation"}],
   "needsHospital": <boolean>,
   "hospitalMessage": "...",
@@ -73,7 +76,7 @@ Heart rate: ${hasHeartRate ? activity.heartRate + ' bpm' : 'NOT PROVIDED'}
 Blood: ${hasBloodData ? JSON.stringify(bloodData) : 'NOT PROVIDED'}
 Previous analyses: ${previousAnalyses?.length || 0}
 
-Provide comprehensive cardiovascular assessment. RESPOND IN ${langName}.`;
+Provide comprehensive health assessment. RESPOND IN ${langName}.`;
 
     } else if (type === "mental_analysis") {
       const { answers, openText, userProfile } = data;
@@ -84,16 +87,21 @@ CRITICAL: ENTIRE response in ${langName}.
 
 Assess based on provided questionnaire answers and open text. Consider work-life balance, stress resilience, and overall mental state. 
 Be thorough: explain psychological mechanisms, coping strategies, and evidence-based interventions.
-Provide AT LEAST 5-8 short-term and 5-8 long-term measures with specific, actionable steps.
-The verdict MUST be at least 300 words covering: current psychological state, identified patterns, risk factors, coping mechanisms assessment, and personalized plan.
+The verdict MUST be at least 400 words — DENSE with useful psychological insights, no filler. Cover: current psychological state, identified patterns, risk factors, coping mechanisms assessment, and personalized plan.
+
+For EACH measure category, provide TWO variants:
+- "withMeds": 5-8 measures WITH specific medications/supplements (names, dosages)
+- "withoutMeds": 5-8 measures WITHOUT medications (therapy techniques, lifestyle changes, exercises)
 
 Response MUST be valid JSON:
 {
-  "verdict": "VERY detailed mental health assessment (300+ words) in ${langName}",
+  "verdict": "VERY detailed mental health assessment (400+ words, no filler) in ${langName}",
   "mentalScore": <0-100, where 100=excellent mental health, 0=critical>,
   "riskCategory": "low|moderate|high|critical",
-  "shortTermMeasures": ["at least 5-8 specific immediate steps in ${langName}"],
-  "longTermMeasures": ["at least 5-8 detailed long-term strategies in ${langName}"],
+  "shortTermWithMeds": ["5-8 immediate measures WITH medications/supplements"],
+  "shortTermWithoutMeds": ["5-8 immediate measures WITHOUT medications"],
+  "longTermWithMeds": ["5-8 long-term measures WITH medications/supplements"],
+  "longTermWithoutMeds": ["5-8 long-term measures WITHOUT medications"],
   "areas": [{"name": "area name in ${langName}", "score": <0-100>, "description": "detailed assessment in ${langName}"}],
   "recommendations": "comprehensive personalized recommendations in ${langName}",
   "references": [{"title": "...", "url": "...", "relevance": "..."}]
@@ -123,7 +131,7 @@ Response MUST be valid JSON:
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "openai/gpt-5.2",
+        model: "google/gemini-2.5-pro",
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
       }),
     });
@@ -145,9 +153,9 @@ Response MUST be valid JSON:
       parsed = JSON.parse(jsonMatch ? jsonMatch[1] : content);
     } catch {
       if (type === "mental_analysis") {
-        parsed = { verdict: content, mentalScore: 50, riskCategory: "moderate", shortTermMeasures: [], longTermMeasures: [], areas: [], recommendations: "", references: [] };
+        parsed = { verdict: content, mentalScore: 50, riskCategory: "moderate", shortTermWithMeds: [], shortTermWithoutMeds: [], longTermWithMeds: [], longTermWithoutMeds: [], areas: [], recommendations: "", references: [] };
       } else {
-        parsed = { verdict: content, riskScore: 50, riskCategory: "moderate", shortTermMeasures: [], longTermMeasures: [], diseases: [], needsHospital: false, symptomsChartScore: 50, bloodChartScore: null, normalHealthScore: 85, references: [] };
+        parsed = { verdict: content, riskScore: 50, riskCategory: "moderate", shortTermWithMeds: [], shortTermWithoutMeds: [], longTermWithMeds: [], longTermWithoutMeds: [], diseases: [], needsHospital: false, symptomsChartScore: 50, bloodChartScore: null, normalHealthScore: 85, references: [] };
       }
     }
 

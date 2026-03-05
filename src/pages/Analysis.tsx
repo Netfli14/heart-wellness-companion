@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Heart, Brain, ArrowRight, ArrowLeft, SkipForward, Loader2, Lock, Upload, Info } from 'lucide-react';
+import { Brain, ArrowRight, ArrowLeft, SkipForward, Loader2, Lock, Upload, Info, Stethoscope } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,7 +11,7 @@ const Analysis = () => {
   const { t, lang } = useLanguage();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<'choice' | 'heart' | 'mental'>('choice');
+  const [mode, setMode] = useState<'choice' | 'health' | 'mental'>('choice');
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [freeText, setFreeText] = useState('');
@@ -20,7 +20,6 @@ const Analysis = () => {
   const [bloodData, setBloodData] = useState({ cholesterol: '', hdl: '', ldl: '', triglycerides: '', glucose: '', hemoglobin: '' });
   const [loading, setLoading] = useState(false);
 
-  // Mental health state
   const [mentalAnswers, setMentalAnswers] = useState<Record<string, string>>({});
   const [mentalOpen, setMentalOpen] = useState('');
 
@@ -46,16 +45,16 @@ const Analysis = () => {
           <h1 className="text-3xl font-bold text-foreground text-center mb-4">{t('analysis.chooseType')}</h1>
           <p className="text-muted-foreground text-center mb-10 max-w-xl mx-auto">{t('analysis.chooseType.desc')}</p>
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Heart */}
-            <button onClick={() => { setMode('heart'); setStep(1); }}
+            {/* Health */}
+            <button onClick={() => { setMode('health'); setStep(1); }}
               className="bg-card rounded-2xl p-8 border-2 border-border hover:border-primary card-medical transition-all text-left group">
-              <Heart className="w-14 h-14 text-primary mb-4 group-hover:scale-110 transition-transform" />
-              <h2 className="text-2xl font-bold text-foreground mb-3">{t('analysis.heart.title')}</h2>
-              <p className="text-muted-foreground mb-4">{t('analysis.heart.desc')}</p>
+              <Stethoscope className="w-14 h-14 text-primary mb-4 group-hover:scale-110 transition-transform" />
+              <h2 className="text-2xl font-bold text-foreground mb-3">{t('analysis.health.title')}</h2>
+              <p className="text-muted-foreground mb-4">{t('analysis.health.desc')}</p>
               <div className="space-y-2 text-sm text-muted-foreground">
-                <p className="flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> {t('analysis.heart.step1')}</p>
-                <p className="flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> {t('analysis.heart.step2')}</p>
-                <p className="flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> {t('analysis.heart.step3')}</p>
+                <p className="flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> {t('analysis.health.step1')}</p>
+                <p className="flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> {t('analysis.health.step2')}</p>
+                <p className="flex items-center gap-2"><Info className="w-4 h-4 text-primary" /> {t('analysis.health.step3')}</p>
               </div>
               <div className="mt-6 flex items-center gap-2 text-primary font-semibold">
                 {t('analysis.start')} <ArrowRight className="w-4 h-4" />
@@ -85,7 +84,6 @@ const Analysis = () => {
   // ============ MENTAL HEALTH ANALYSIS ============
   if (mode === 'mental') {
     const mentalQuestionKeys = ['mq1','mq2','mq3','mq4','mq5','mq6','mq7','mq8'] as const;
-    const mentalStepsTotal = 3;
     const canProceedMentalStep1 = Object.keys(mentalAnswers).length >= mentalQuestionKeys.length;
 
     const handleMentalSubmit = async () => {
@@ -95,11 +93,7 @@ const Analysis = () => {
           body: {
             type: 'mental_analysis',
             lang,
-            data: {
-              answers: mentalAnswers,
-              openText: mentalOpen,
-              userProfile: profile,
-            },
+            data: { answers: mentalAnswers, openText: mentalOpen, userProfile: profile },
           },
         });
         if (error) throw error;
@@ -108,12 +102,9 @@ const Analysis = () => {
         const prev = JSON.parse(localStorage.getItem('cvx_mental_analyses') || '[]');
         localStorage.setItem('cvx_mental_analyses', JSON.stringify([...prev, analysis]));
 
-        // Also save to DB
         if (user) {
           await supabase.from('health_analyses').insert({
-            user_id: user.id,
-            analysis_type: 'mental',
-            result: data,
+            user_id: user.id, analysis_type: 'mental', result: data,
           });
         }
         navigate('/mental-chart');
@@ -121,10 +112,10 @@ const Analysis = () => {
         console.error('Mental analysis error:', err);
         const fallback = {
           date: new Date().toISOString(), type: 'mental',
-          verdict: 'Analysis completed. Consult a specialist for detailed assessment.',
+          verdict: 'Analysis completed. Consult a specialist.',
           mentalScore: 70, riskCategory: 'moderate',
-          shortTermMeasures: ['Practice deep breathing'],
-          longTermMeasures: ['Regular therapy sessions'],
+          shortTermWithMeds: [], shortTermWithoutMeds: ['Practice deep breathing'],
+          longTermWithMeds: [], longTermWithoutMeds: ['Regular therapy sessions'],
           areas: [],
         };
         const prev = JSON.parse(localStorage.getItem('cvx_mental_analyses') || '[]');
@@ -146,7 +137,6 @@ const Analysis = () => {
             <h1 className="text-2xl font-bold text-foreground">{t('analysis.mental.title')}</h1>
           </div>
 
-          {/* Progress */}
           <div className="flex items-center justify-center gap-2 mb-8">
             {[1,2,3].map(s => (
               <div key={s} className="flex items-center gap-2">
@@ -165,7 +155,6 @@ const Analysis = () => {
             </div>
           ) : (
             <>
-              {/* Step 1: Image-based + structured questions */}
               {step === 1 && (
                 <div className="space-y-4">
                   {mentalQuestionKeys.map(q => (
@@ -190,7 +179,6 @@ const Analysis = () => {
                 </div>
               )}
 
-              {/* Step 2: Open questions */}
               {step === 2 && (
                 <div className="space-y-4">
                   <div className="bg-card rounded-xl p-6 border border-border card-medical">
@@ -210,7 +198,6 @@ const Analysis = () => {
                 </div>
               )}
 
-              {/* Step 3: Review & Submit */}
               {step === 3 && (
                 <div className="space-y-4">
                   <div className="bg-card rounded-xl p-6 border border-border card-medical text-center">
@@ -235,7 +222,7 @@ const Analysis = () => {
     );
   }
 
-  // ============ HEART ANALYSIS (existing flow) ============
+  // ============ HEALTH ANALYSIS ============
   const stepsTotal = 5;
   const canProceedStep1 = Object.keys(answers).length >= heartSymptomKeys.length;
   const inputClass = "w-full px-3 py-2.5 bg-muted border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring";
@@ -260,9 +247,7 @@ const Analysis = () => {
 
       if (user) {
         await supabase.from('health_analyses').insert({
-          user_id: user.id,
-          analysis_type: 'heart',
-          result: data,
+          user_id: user.id, analysis_type: 'health', result: data,
         });
       }
       navigate('/chart');
@@ -277,8 +262,10 @@ const Analysis = () => {
         verdict: 'Analysis performed based on entered data. Consult a doctor.',
         riskScore: Math.round((score / maxScore) * 100),
         riskCategory: score / maxScore <= 0.3 ? 'low' : score / maxScore <= 0.6 ? 'moderate' : 'high',
-        shortTermMeasures: ['Monitor blood pressure'],
-        longTermMeasures: ['Regular checkups'],
+        shortTermWithMeds: ['Monitor blood pressure'],
+        shortTermWithoutMeds: ['Practice deep breathing'],
+        longTermWithMeds: ['Regular checkups'],
+        longTermWithoutMeds: ['Improve diet and exercise'],
         diseases: [], needsHospital: score / maxScore > 0.6,
         symptomsChartScore, bloodChartScore: null,
         normalHealthScore: 85, references: [],
@@ -298,11 +285,10 @@ const Analysis = () => {
           <button onClick={() => setMode('choice')} className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <Heart className="w-8 h-8 text-primary" />
+          <Stethoscope className="w-8 h-8 text-primary" />
           <h1 className="text-2xl font-bold text-foreground">{t('analysis.title')}</h1>
         </div>
 
-        {/* Progress */}
         <div className="flex items-center justify-center gap-2 mb-8">
           {[1,2,3,4,5].map(s => (
             <div key={s} className="flex items-center gap-2">
