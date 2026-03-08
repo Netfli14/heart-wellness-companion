@@ -10,7 +10,7 @@ const fadeInUp = {
   initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-50px" },
-  transition: { duration: 0.5, ease: "easeOut" }
+  transition: { duration: 0.5, ease: [0, 0, 0.2, 1] as const }
 };
 
 const EmergencyCallDialog = ({ open, onClose, t }: { open: boolean; onClose: () => void; t: (k: string) => string }) => {
