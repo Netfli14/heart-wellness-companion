@@ -264,6 +264,18 @@ export const translations: Record<Lang, Record<string, string>> = {
     'feedback.empty': 'Пока нет отзывов.',
     'feedback.total': 'отзывов',
     'feedback.avgLikes': 'ср. лайков',
+    // Emergency
+    'emergency.confirm': 'Вызвать скорую помощь?',
+    'emergency.confirmDesc': 'Вы будете перенаправлены на набор номера 103 (скорая помощь Казахстана)',
+    'emergency.cancel': 'Отмена',
+    'emergency.call103': 'Вызвать 103',
+    'emergency.highRisk': 'ВНИМАНИЕ: ВЫСОКИЙ РИСК!',
+    'emergency.highRiskDesc': 'Ваш балл риска критически высокий. Настоятельно рекомендуем обратиться к врачу или вызвать скорую помощь.',
+    'emergency.highRiskMental': 'ВНИМАНИЕ: КРИТИЧЕСКОЕ СОСТОЯНИЕ!',
+    'emergency.highRiskMentalDesc': 'Ваш балл ментального здоровья критически низкий. Обратитесь к специалисту или позвоните на горячую линию.',
+    'mental.areas': 'Области оценки',
+    'chat.search': 'Поиск...',
+    'chat.yesterday': 'Вчера',
     // Footer
     'footer.rights': '© 2026 Clinical Vision eXpert. Все права защищены.',
     'footer.disclaimer': 'Не является медицинским заключением. Обратитесь к врачу.',
