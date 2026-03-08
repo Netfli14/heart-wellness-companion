@@ -248,7 +248,10 @@ const HealthChart = () => {
                 {/* Verdict with sections */}
                 <motion.div {...fadeInUp} className="bg-card rounded-2xl p-6 border border-border card-medical">
                   <h2 className="text-lg font-bold text-foreground mb-3">{t('results.verdict')}</h2>
-                  <p className="text-sm text-foreground leading-relaxed mb-4">{latest.verdictSummary || latest.verdict}</p>
+                  <p className="text-sm text-foreground leading-relaxed mb-3">{latest.verdictSummary || latest.verdict}</p>
+                  <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 rounded-xl p-4 mb-4">
+                    <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">⚠️ {lang === 'ru' ? 'Настоятельно рекомендуем сначала проконсультироваться с врачом. Не принимайте таблетки без разбора!' : lang === 'kz' ? 'Алдымен дәрігермен кеңесуді қатаң ұсынамыз. Дәрілерді бас-басына қабылдамаңыз!' : 'We strongly recommend consulting a doctor first. Do not take medications indiscriminately!'}</p>
+                  </div>
                   {latest.verdictSections?.length > 0 && (
                     <div className="space-y-2">
                       {latest.verdictSections.map((section: any, i: number) => (
