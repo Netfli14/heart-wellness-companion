@@ -23,7 +23,7 @@ const hospitals = [
     name: 'Medical Center Hospital of the President',
     address: { ru: 'Астана, пр. Мәңгілік Ел, 6', kz: 'Астана, Мәңгілік Ел даңғылы, 6', en: 'Astana, Mangilik El Ave, 6' },
     phones: [{ label: 'adult', number: '+7-7172-70-71-00' }],
-    mapUrl: 'https://maps.google.com/?q=Medical+Center+Hospital+of+President+Astana',
+    mapUrl: 'https://2gis.kz/astana/search/Больница%20Медицинского%20центра%20Управления%20делами%20Президента',
     recommended: false,
   },
 ];
