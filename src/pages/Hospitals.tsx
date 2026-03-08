@@ -16,7 +16,7 @@ const hospitals = [
     name: 'National Scientific Cardiac Surgery Center',
     address: { ru: 'Астана, ул. Туркестан, 10', kz: 'Астана, Түркістан көш., 10', en: 'Astana, Turkestan St, 10' },
     phones: [{ label: 'adult', number: '+7-7172-70-80-70' }],
-    mapUrl: 'https://maps.google.com/?q=National+Scientific+Cardiac+Surgery+Center+Astana',
+    mapUrl: 'https://2gis.kz/astana/search/Национальный%20научный%20кардиохирургический%20центр',
     recommended: true,
   },
   {
