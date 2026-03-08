@@ -23,105 +23,92 @@ serve(async (req) => {
       const hasHeartRate = activity?.heartRate && activity.heartRate.toString().trim() !== '';
       const hasBloodData = bloodData && Object.values(bloodData).some((v: any) => v !== '' && v != null);
 
-      systemPrompt = `You are a senior medical AI assistant for Clinical Vision eXpert (CVX). Provide EXTREMELY DETAILED and COMPREHENSIVE health analysis based on ESC, AHA/ACC, WHO guidelines.
+      systemPrompt = `You are a senior medical AI for CVX. Provide CONCISE but THOROUGH health analysis. NO markdown symbols (**, ##, *, etc). Plain text only. Use numbered lists where needed.
 
-CRITICAL: ENTIRE response in ${langName}. Every field, every word.
+CRITICAL: ENTIRE response in ${langName}. Be direct and actionable.
 
 RULES:
-1. Reference specific medical guidelines with links to relevant studies for EACH disease.
-2. "symptomsChartScore" = HEALTH score (0=critical, 100=excellent). Must be CONSISTENT with verdict/risk.
-3. "riskScore" = RISK (0=no risk, 100=critical). Inverse of health score.
-4. "normalHealthScore" = expected healthy score for this age/gender (78-95). Justify in "normalScoreJustification".
-5. The verdict MUST be at least 400 words. It should be DENSE with useful medical information — no filler, no repetition. Cover: current state assessment, risk factor analysis, physiological explanation, prognosis, and personalized recommendations.
-6. For EACH measure category, provide TWO variants:
-   - "withMeds": 5-8 measures WITH specific medications (drug names, dosages, frequencies, contraindications)
-   - "withoutMeds": 5-8 measures WITHOUT medications (lifestyle changes, exercises, diet modifications, supplements)
-7. For each disease, provide detailed reasoning with pathophysiology explanation.
-${!hasHeartRate ? `8. Patient DID NOT provide heart rate. DO NOT diagnose heart-rate-dependent conditions (tachycardia, bradycardia, arrhythmia).` : ''}
-${!hasBloodData ? `9. Patient DID NOT provide blood data. DO NOT diagnose blood-test-dependent conditions (dyslipidemia, diabetes). Set bloodChartScore to null.` : ''}
+1. "symptomsChartScore" = HEALTH score (0=critical, 100=excellent).
+2. "riskScore" = RISK (0=no risk, 100=critical).
+3. "normalHealthScore" = expected healthy score for age/gender (78-95).
+4. "verdictSummary" = 2-3 sentence overview of current state.
+5. "verdictSections" = array of sections, each with "title" and "content" (100-150 words each). Sections: Current State, Risk Factors, Physiological Explanation, Prognosis, Key Recommendations.
+6. For EACH measure category provide 8-12 specific items. NO extra symbols, just clean numbered text.
+   - "withoutMeds": lifestyle, exercises, diet, supplements, breathing techniques, sleep hygiene, stress management
+   - "withMeds": specific drugs with dosages, frequencies, contraindications
+7. For each disease: name, risk 0-100, brief reasoning.
+${!hasHeartRate ? `8. No heart rate provided. Skip heart-rate-dependent conditions.` : ''}
+${!hasBloodData ? `9. No blood data. Skip blood-dependent conditions. bloodChartScore=null.` : ''}
 
 Response MUST be valid JSON:
 {
-  "verdict": "VERY detailed verdict (400+ words, no filler) in ${langName}",
+  "verdictSummary": "concise 2-3 sentence summary",
+  "verdictSections": [{"title": "...", "content": "..."}],
   "riskScore": <0-100>,
   "riskCategory": "low|moderate|high|critical",
-  "shortTermWithMeds": ["5-8 specific short-term measures WITH medications"],
-  "shortTermWithoutMeds": ["5-8 specific short-term measures WITHOUT medications"],
-  "longTermWithMeds": ["5-8 detailed long-term measures WITH medications"],
-  "longTermWithoutMeds": ["5-8 detailed long-term measures WITHOUT medications"],
-  "diseases": [{"name": "...", "risk": <0-100>, "reasoning": "detailed pathophysiology explanation"}],
+  "shortTermWithoutMeds": ["8-12 items"],
+  "shortTermWithMeds": ["8-12 items"],
+  "longTermWithoutMeds": ["8-12 items"],
+  "longTermWithMeds": ["8-12 items"],
+  "diseases": [{"name": "...", "risk": <0-100>, "reasoning": "brief explanation"}],
   "needsHospital": <boolean>,
   "hospitalMessage": "...",
-  "nextAnalysisMessage": "...",
   "symptomsChartScore": <0-100>,
   "bloodChartScore": <0-100 or null>,
   "normalHealthScore": <78-95>,
   "normalScoreJustification": "...",
-  "normalSymptomsInfo": "...",
-  "normalBloodInfo": "...",
-  "dataLimitations": "...",
   "references": [{"title": "...", "url": "...", "relevance": "..."}]
 }`;
 
       userPrompt = `Patient: Age=${userProfile?.age||'?'}, Gender=${userProfile?.gender||'?'}, City=${userProfile?.city||'?'}
 Chronic: ${userProfile?.chronic_diseases||'none'}, Allergies: ${userProfile?.allergies||'none'}, Habits: ${userProfile?.bad_habits||'none'}
-Body features: ${userProfile?.body_features||'none'}
-Work hours/week: ${userProfile?.work_hours_per_week||'?'}, Stress resilience: ${userProfile?.stress_resilience||'?'}
-
+Body: ${userProfile?.body_features||'none'}, Work hrs/wk: ${userProfile?.work_hours_per_week||'?'}, Stress resilience: ${userProfile?.stress_resilience||'?'}
 Symptoms: ${JSON.stringify(symptoms)}
-Free text: ${freeText || 'Not provided'}
-Diet: ${diet || 'Not provided'}
+Free text: ${freeText || 'N/A'}
+Diet: ${diet || 'N/A'}
 Exercise: ${activity?.exercise||'?'}, Sleep: ${activity?.sleep||'?'}, Stress: ${activity?.stress||'?'}
-Heart rate: ${hasHeartRate ? activity.heartRate + ' bpm' : 'NOT PROVIDED'}
-Blood: ${hasBloodData ? JSON.stringify(bloodData) : 'NOT PROVIDED'}
-Previous analyses: ${previousAnalyses?.length || 0}
-
-Provide comprehensive health assessment. RESPOND IN ${langName}.`;
+Heart rate: ${hasHeartRate ? activity.heartRate + ' bpm' : 'N/A'}
+Blood: ${hasBloodData ? JSON.stringify(bloodData) : 'N/A'}
+Previous: ${previousAnalyses?.length || 0}
+RESPOND IN ${langName}. No markdown symbols.`;
 
     } else if (type === "mental_analysis") {
       const { answers, openText, userProfile } = data;
 
-      systemPrompt = `You are a clinical psychologist AI assistant for Clinical Vision eXpert (CVX). Provide EXTREMELY DETAILED and COMPREHENSIVE mental health assessment.
+      systemPrompt = `You are a clinical psychologist AI for CVX. Provide CONCISE but THOROUGH mental health assessment. NO markdown symbols (**, ##, *, etc). Plain text only.
 
-CRITICAL: ENTIRE response in ${langName}.
+CRITICAL: ENTIRE response in ${langName}. Be direct.
 
-Assess based on provided questionnaire answers and open text. Consider work-life balance, stress resilience, and overall mental state. 
-Be thorough: explain psychological mechanisms, coping strategies, and evidence-based interventions.
-The verdict MUST be at least 400 words — DENSE with useful psychological insights, no filler. Cover: current psychological state, identified patterns, risk factors, coping mechanisms assessment, and personalized plan.
+Provide "verdictSummary" (2-3 sentences) and "verdictSections" (array of sections with title/content, 100-150 words each). Sections: Current State, Identified Patterns, Risk Factors, Coping Assessment, Personalized Plan.
 
-For EACH measure category, provide TWO variants:
-- "withMeds": 5-8 measures WITH specific medications/supplements (names, dosages)
-- "withoutMeds": 5-8 measures WITHOUT medications (therapy techniques, lifestyle changes, exercises)
+For measures provide 8-12 items each:
+- "withoutMeds": therapy techniques, lifestyle changes, exercises, meditation, social strategies
+- "withMeds": specific supplements/medications with dosages
 
 Response MUST be valid JSON:
 {
-  "verdict": "VERY detailed mental health assessment (400+ words, no filler) in ${langName}",
-  "mentalScore": <0-100, where 100=excellent mental health, 0=critical>,
+  "verdictSummary": "concise 2-3 sentence summary",
+  "verdictSections": [{"title": "...", "content": "..."}],
+  "mentalScore": <0-100>,
   "riskCategory": "low|moderate|high|critical",
-  "shortTermWithMeds": ["5-8 immediate measures WITH medications/supplements"],
-  "shortTermWithoutMeds": ["5-8 immediate measures WITHOUT medications"],
-  "longTermWithMeds": ["5-8 long-term measures WITH medications/supplements"],
-  "longTermWithoutMeds": ["5-8 long-term measures WITHOUT medications"],
-  "areas": [{"name": "area name in ${langName}", "score": <0-100>, "description": "detailed assessment in ${langName}"}],
-  "recommendations": "comprehensive personalized recommendations in ${langName}",
+  "shortTermWithoutMeds": ["8-12 items"],
+  "shortTermWithMeds": ["8-12 items"],
+  "longTermWithoutMeds": ["8-12 items"],
+  "longTermWithMeds": ["8-12 items"],
+  "areas": [{"name": "...", "score": <0-100>, "description": "brief assessment"}],
+  "recommendations": "key recommendations",
   "references": [{"title": "...", "url": "...", "relevance": "..."}]
 }`;
 
       userPrompt = `Patient: Age=${userProfile?.age||'?'}, Gender=${userProfile?.gender||'?'}
-Work hours/week: ${userProfile?.work_hours_per_week||'?'}
-Stress resilience: ${userProfile?.stress_resilience||'?'}
-Chronic conditions: ${userProfile?.chronic_diseases||'none'}
-
-Mental health questionnaire:
-${JSON.stringify(answers, null, 2)}
-
-Open text (how they feel):
-${openText || 'Not provided'}
-
-Provide comprehensive mental health assessment. RESPOND IN ${langName}.`;
+Work hrs/wk: ${userProfile?.work_hours_per_week||'?'}, Stress resilience: ${userProfile?.stress_resilience||'?'}
+Chronic: ${userProfile?.chronic_diseases||'none'}
+Answers: ${JSON.stringify(answers)}
+Open text: ${openText || 'N/A'}
+RESPOND IN ${langName}. No markdown symbols.`;
 
     } else if (type === "prescription") {
-      systemPrompt = `You are a pharmacist AI. Analyze prescription. RESPOND IN ${langName}.
+      systemPrompt = `Pharmacist AI. Analyze prescription. RESPOND IN ${langName}. No markdown.
 Response MUST be valid JSON:
 {"medications": [{"name": "...", "dosage": "...", "purpose": "..."}], "advice": "..."}`;
       userPrompt = `Prescription: ${data.prescriptionText || 'No text'}`;
@@ -131,7 +118,7 @@ Response MUST be valid JSON:
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash-lite",
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
       }),
     });
@@ -153,11 +140,23 @@ Response MUST be valid JSON:
       parsed = JSON.parse(jsonMatch ? jsonMatch[1] : content);
     } catch {
       if (type === "mental_analysis") {
-        parsed = { verdict: content, mentalScore: 50, riskCategory: "moderate", shortTermWithMeds: [], shortTermWithoutMeds: [], longTermWithMeds: [], longTermWithoutMeds: [], areas: [], recommendations: "", references: [] };
+        parsed = { verdictSummary: content, verdictSections: [], mentalScore: 50, riskCategory: "moderate", shortTermWithMeds: [], shortTermWithoutMeds: [], longTermWithMeds: [], longTermWithoutMeds: [], areas: [], recommendations: "", references: [] };
       } else {
-        parsed = { verdict: content, riskScore: 50, riskCategory: "moderate", shortTermWithMeds: [], shortTermWithoutMeds: [], longTermWithMeds: [], longTermWithoutMeds: [], diseases: [], needsHospital: false, symptomsChartScore: 50, bloodChartScore: null, normalHealthScore: 85, references: [] };
+        parsed = { verdictSummary: content, verdictSections: [], riskScore: 50, riskCategory: "moderate", shortTermWithMeds: [], shortTermWithoutMeds: [], longTermWithMeds: [], longTermWithoutMeds: [], diseases: [], needsHospital: false, symptomsChartScore: 50, bloodChartScore: null, normalHealthScore: 85, references: [] };
       }
     }
+
+    // Clean markdown symbols from all string values
+    const cleanText = (s: string) => s?.replace(/[*#_~`>]/g, '').replace(/\n{3,}/g, '\n\n').trim() || s;
+    if (parsed.verdictSummary) parsed.verdictSummary = cleanText(parsed.verdictSummary);
+    if (parsed.verdictSections) parsed.verdictSections = parsed.verdictSections.map((s: any) => ({ ...s, title: cleanText(s.title), content: cleanText(s.content) }));
+    if (parsed.verdict) { parsed.verdictSummary = cleanText(parsed.verdict); delete parsed.verdict; }
+    
+    const cleanArray = (arr: string[]) => arr?.map(cleanText) || [];
+    parsed.shortTermWithMeds = cleanArray(parsed.shortTermWithMeds);
+    parsed.shortTermWithoutMeds = cleanArray(parsed.shortTermWithoutMeds);
+    parsed.longTermWithMeds = cleanArray(parsed.longTermWithMeds);
+    parsed.longTermWithoutMeds = cleanArray(parsed.longTermWithoutMeds);
 
     return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
