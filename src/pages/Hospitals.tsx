@@ -9,7 +9,7 @@ const hospitals = [
       { label: 'adult', number: '+7-701-104-18-83' },
       { label: 'child', number: '+7-775-321-80-78' },
     ],
-    mapUrl: 'https://maps.google.com/?q=UMC+Astana+Kazakhstan',
+    mapUrl: 'https://2gis.kz/astana/search/UMC',
     recommended: true,
   },
   {
