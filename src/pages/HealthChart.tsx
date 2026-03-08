@@ -36,7 +36,7 @@ const EmergencyCallDialog = ({ open, onClose, t }: { open: boolean; onClose: () 
 const VerdictSection = ({ section, index }: { section: { title: string; content: string }; index: number }) => {
   const [open, setOpen] = useState(false);
   return (
-    <motion.div {...fadeInUp} transition={{ ...fadeInUp.transition, delay: index * 0.1 }}
+    <motion.div {...fadeInUp} transition={{ duration: 0.5, ease: [0, 0, 0.2, 1] as const, delay: index * 0.1 }}
       className="bg-muted/30 rounded-xl border border-border overflow-hidden">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/50 transition-colors">
         <span className="font-semibold text-foreground text-sm">{section.title}</span>
