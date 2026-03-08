@@ -74,7 +74,7 @@ const MeasuresList = ({ items, icon: Icon, color, label }: { items: string[]; ic
 );
 
 const MentalChart = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { user } = useAuth();
   const [analyses, setAnalyses] = useState<any[]>([]);
   const [showEmergency, setShowEmergency] = useState(false);

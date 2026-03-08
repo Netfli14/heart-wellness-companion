@@ -74,7 +74,7 @@ const MeasuresList = ({ items, icon: Icon, color, label }: { items: string[]; ic
 );
 
 const HealthChart = () => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState<any[]>([]);
